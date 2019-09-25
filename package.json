@@ -1,0 +1,58 @@
+{
+	"name": "@edjopato/datastore",
+	"version": "0.0.0",
+	"description": "Handles different ways to store data within NodeJS",
+	"license": "MIT",
+	"repository": "EdJoPaTo/js-datastore",
+	"author": {
+		"name": "EdJoPaTo",
+		"email": "edjopato@gmail.com",
+		"url": "https://edjopato.de"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"build": "del dist && tsc",
+		"prepack": "npm run build",
+		"test": "tsc && xo"
+	},
+	"main": "dist",
+	"types": "dist",
+	"files": [
+		"dist",
+		"!*.test.*"
+	],
+	"keywords": [
+		"wikidata"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"write-json-file": "^4.2.0"
+	},
+	"devDependencies": {
+		"@sindresorhus/tsconfig": "^0.4.0",
+		"@types/node": "^12.0.2",
+		"@typescript-eslint/eslint-plugin": "^2.3.1",
+		"@typescript-eslint/parser": "^2.3.1",
+		"del-cli": "^3.0.0",
+		"eslint-config-xo-typescript": "^0.18.0",
+		"typescript": "^3.3.3",
+		"xo": "^0.24.0"
+	},
+	"xo": {
+		"semi": false,
+		"extends": "xo-typescript",
+		"extensions": [
+			"ts"
+		],
+		"rules": {
+			"@typescript-eslint/semi": [
+				"error",
+				"never"
+			]
+		}
+	}
+}
