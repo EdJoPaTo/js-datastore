@@ -33,14 +33,14 @@
 		"write-json-file": "^4.2.0"
 	},
 	"devDependencies": {
-		"@sindresorhus/tsconfig": "^0.4.0",
+		"@sindresorhus/tsconfig": "^0.6.0",
 		"@types/node": "^12.0.2",
-		"@typescript-eslint/eslint-plugin": "^2.3.1",
-		"@typescript-eslint/parser": "^2.3.1",
+		"@typescript-eslint/eslint-plugin": "^2.11.0",
+		"@typescript-eslint/parser": "^2.11.0",
 		"del-cli": "^3.0.0",
-		"eslint-config-xo-typescript": "^0.18.0",
-		"typescript": "^3.3.3",
-		"xo": "^0.24.0"
+		"eslint-config-xo-typescript": "^0.23.0",
+		"typescript": "^3.7.3",
+		"xo": "^0.25.3"
 	},
 	"xo": {
 		"semi": false,
@@ -49,6 +49,7 @@
 			"ts"
 		],
 		"rules": {
+			"@typescript-eslint/no-dynamic-delete": "off",
 			"@typescript-eslint/semi": [
 				"error",
 				"never"
