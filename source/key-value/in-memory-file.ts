@@ -1,11 +1,11 @@
 import {readFileSync, unlinkSync, existsSync} from 'fs'
 
-import {Dictionary, KeyValueStorage} from './type'
+import {KeyValueStorage} from './type'
 
 import writeJsonFile = require('write-json-file')
 
 export class KeyValueInMemoryFile<T> implements KeyValueStorage<T> {
-	private _inMemoryStorage: Dictionary<T> = {}
+	private _inMemoryStorage: Record<string, T | undefined> = {}
 
 	constructor(
 		private readonly _filepath: string
@@ -17,7 +17,7 @@ export class KeyValueInMemoryFile<T> implements KeyValueStorage<T> {
 		}
 	}
 
-	entries(): Dictionary<T> {
+	entries(): Record<string, T | undefined> {
 		return this._inMemoryStorage
 	}
 

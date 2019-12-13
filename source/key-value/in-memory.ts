@@ -1,9 +1,9 @@
-import {Dictionary, KeyValueStorage} from './type'
+import {KeyValueStorage} from './type'
 
 export class KeyValueInMemory<T> implements KeyValueStorage<T> {
-	private _inMemoryStorage: Dictionary<T> = {}
+	private _inMemoryStorage: Record<string, T | undefined> = {}
 
-	entries(): Dictionary<T> {
+	entries(): Record<string, T | undefined> {
 		return this._inMemoryStorage
 	}
 
