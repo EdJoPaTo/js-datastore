@@ -1,6 +1,6 @@
 {
 	"name": "@edjopato/datastore",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Handles different ways to store data within NodeJS",
 	"license": "MIT",
 	"repository": "EdJoPaTo/js-datastore",
