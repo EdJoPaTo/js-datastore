@@ -1,25 +1,27 @@
-import {KeyValueStorage} from './type'
+import {ExtendedStore} from './type'
 
-export class KeyValueInMemory<T> implements KeyValueStorage<T> {
-	private _inMemoryStorage: Record<string, T | undefined> = {}
+export class KeyValueInMemory<T> implements ExtendedStore<T> {
+	readonly ttlSupport = false
 
-	entries(): Record<string, T | undefined> {
-		return this._inMemoryStorage
-	}
+	private readonly _inMemoryStorage: Map<string, T> = new Map()
 
 	keys(): readonly string[] {
-		return Object.keys(this._inMemoryStorage)
+		return [...this._inMemoryStorage.keys()]
 	}
 
 	get(key: string): T | undefined {
-		return this._inMemoryStorage[key]
+		return this._inMemoryStorage.get(key)
 	}
 
 	set(key: string, value: T): void {
-		this._inMemoryStorage[key] = value
+		this._inMemoryStorage.set(key, value)
 	}
 
-	delete(key: string): void {
-		delete this._inMemoryStorage[key]
+	delete(key: string): boolean {
+		return this._inMemoryStorage.delete(key)
+	}
+
+	clear(): void {
+		this._inMemoryStorage.clear()
 	}
 }

@@ -42,7 +42,7 @@
 	"xo": {
 		"semicolon": false,
 		"rules": {
-			"@typescript-eslint/no-dynamic-delete": "off"
+			"@typescript-eslint/class-literal-property-style": "off"
 		}
 	}
 }

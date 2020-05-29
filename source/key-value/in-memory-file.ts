@@ -1,11 +1,13 @@
 import {readFileSync, unlinkSync, existsSync} from 'fs'
 
-import {KeyValueStorage} from './type'
+import {ExtendedStore} from './type'
 
 import writeJsonFile = require('write-json-file')
 
-export class KeyValueInMemoryFile<T> implements KeyValueStorage<T> {
-	private _inMemoryStorage: Record<string, T | undefined> = {}
+export class KeyValueInMemoryFile<T> implements ExtendedStore<T> {
+	readonly ttlSupport = false
+
+	private readonly _inMemoryStorage: Map<string, T> = new Map()
 
 	constructor(
 		private readonly _filepath: string
@@ -13,30 +15,43 @@ export class KeyValueInMemoryFile<T> implements KeyValueStorage<T> {
 		if (existsSync(this._filepath)) {
 			const raw = readFileSync(this._filepath, 'utf8')
 			const json = JSON.parse(raw)
-			this._inMemoryStorage = json
+			const keys = Object.keys(json)
+			for (const key of keys) {
+				this._inMemoryStorage.set(key, json[key])
+			}
 		}
 	}
 
-	entries(): Record<string, T | undefined> {
-		return this._inMemoryStorage
-	}
-
 	keys(): readonly string[] {
-		return Object.keys(this._inMemoryStorage)
+		return [...this._inMemoryStorage.keys()]
 	}
 
 	get(key: string): T | undefined {
-		return this._inMemoryStorage[key]
+		return this._inMemoryStorage.get(key)
 	}
 
 	async set(key: string, value: T): Promise<void> {
-		this._inMemoryStorage[key] = value
-		await writeJsonFile(this._filepath, this._inMemoryStorage, {sortKeys: true})
+		this._inMemoryStorage.set(key, value)
+		const json: Record<string, T> = {}
+		for (const key of this._inMemoryStorage.keys()) {
+			json[key] = this._inMemoryStorage.get(key)!
+		}
+
+		await writeJsonFile(this._filepath, json, {sortKeys: true})
 	}
 
-	delete(key: string): void {
-		delete this._inMemoryStorage[key]
-		if (JSON.stringify(this._inMemoryStorage) === '{}' && existsSync(this._filepath)) {
+	delete(key: string): boolean {
+		const result = this._inMemoryStorage.delete(key)
+		if (this._inMemoryStorage.size === 0 && existsSync(this._filepath)) {
+			unlinkSync(this._filepath)
+		}
+
+		return result
+	}
+
+	clear(): void {
+		this._inMemoryStorage.clear()
+		if (existsSync(this._filepath)) {
 			unlinkSync(this._filepath)
 		}
 	}

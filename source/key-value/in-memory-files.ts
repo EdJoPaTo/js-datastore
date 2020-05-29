@@ -1,11 +1,13 @@
 import {mkdirSync, readdirSync, readFileSync, unlinkSync, existsSync} from 'fs'
 
-import {KeyValueStorage} from './type'
+import {ExtendedStore} from './type'
 
 import writeJsonFile = require('write-json-file')
 
-export class KeyValueInMemoryFiles<T> implements KeyValueStorage<T> {
-	private _inMemoryStorage: Record<string, T | undefined> = {}
+export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
+	readonly ttlSupport = false
+
+	private readonly _inMemoryStorage: Map<string, T> = new Map()
 
 	constructor(
 		private readonly _directory: string
@@ -14,31 +16,35 @@ export class KeyValueInMemoryFiles<T> implements KeyValueStorage<T> {
 
 		const entries = this._listFromFS()
 		for (const entry of entries) {
-			this._inMemoryStorage[entry] = this._getFromFS(entry)
+			this._inMemoryStorage.set(entry, this._getFromFS(entry))
 		}
 	}
 
-	entries(): Record<string, T | undefined> {
-		return this._inMemoryStorage
-	}
-
 	keys(): readonly string[] {
-		return Object.keys(this._inMemoryStorage)
+		return [...this._inMemoryStorage.keys()]
 	}
 
 	get(key: string): T | undefined {
-		return this._inMemoryStorage[key]
+		return this._inMemoryStorage.get(key)
 	}
 
 	async set(key: string, value: T): Promise<void> {
-		this._inMemoryStorage[key] = value
+		this._inMemoryStorage.set(key, value)
 		await writeJsonFile(this._pathOfKey(key), value, {sortKeys: true})
 	}
 
-	delete(key: string): void {
-		delete this._inMemoryStorage[key]
+	delete(key: string): boolean {
+		const result = this._inMemoryStorage.delete(key)
 		if (existsSync(this._pathOfKey(key))) {
 			unlinkSync(this._pathOfKey(key))
+		}
+
+		return result
+	}
+
+	clear(): void {
+		for (const key of this.keys()) {
+			this.delete(key)
 		}
 	}
 
