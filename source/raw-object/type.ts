@@ -1,7 +1,7 @@
 import {MaybePromise} from '../types'
 
 export interface RawObjectStorage<T> {
-	delete(): MaybePromise<void>;
-	get(): MaybePromise<T | undefined>;
-	set(value: T): MaybePromise<void>;
+	readonly delete: () => MaybePromise<void>;
+	readonly get: () => MaybePromise<T | undefined>;
+	readonly set: (value: T) => MaybePromise<void>;
 }
