@@ -13,8 +13,8 @@ export class KeyValueInMemoryFiles<T> implements KeyValueStorage<T> {
 		mkdirSync(_directory, {recursive: true})
 
 		const entries = this._listFromFS()
-		for (const e of entries) {
-			this._inMemoryStorage[e] = this._getFromFS(e)
+		for (const entry of entries) {
+			this._inMemoryStorage[entry] = this._getFromFS(entry)
 		}
 	}
 
