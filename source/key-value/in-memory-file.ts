@@ -32,17 +32,14 @@ export class KeyValueInMemoryFile<T> implements ExtendedStore<T> {
 
 	async set(key: string, value: T): Promise<void> {
 		this._inMemoryStorage.set(key, value)
-		const json: Record<string, T> = {}
-		for (const key of this._inMemoryStorage.keys()) {
-			json[key] = this._inMemoryStorage.get(key)!
-		}
-
-		await writeJsonFile(this._filepath, json, {sortKeys: true})
+		await writeJsonFile(this._filepath, this._createFileContent(), {sortKeys: true})
 	}
 
-	delete(key: string): boolean {
+	async delete(key: string): Promise<boolean> {
 		const result = this._inMemoryStorage.delete(key)
-		if (this._inMemoryStorage.size === 0 && existsSync(this._filepath)) {
+		if (this._inMemoryStorage.size > 0) {
+			await writeJsonFile(this._filepath, this._createFileContent(), {sortKeys: true})
+		} else if (existsSync(this._filepath)) {
 			unlinkSync(this._filepath)
 		}
 
@@ -54,5 +51,14 @@ export class KeyValueInMemoryFile<T> implements ExtendedStore<T> {
 		if (existsSync(this._filepath)) {
 			unlinkSync(this._filepath)
 		}
+	}
+
+	private _createFileContent(): Record<string, unknown> {
+		const json: Record<string, unknown> = {}
+		for (const key of this._inMemoryStorage.keys()) {
+			json[key] = this._inMemoryStorage.get(key)!
+		}
+
+		return json
 	}
 }
