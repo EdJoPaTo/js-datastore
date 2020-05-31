@@ -1,6 +1,23 @@
 import {MaybePromise} from './types'
 import {KeyValueInMemory} from './key-value'
 
+import {arrayToRecord} from './transform'
+
+export type QueryOneFunction<T> = (key: string) => MaybePromise<T>
+export type QueryBulkFunction<T> = (keys: readonly string[]) => MaybePromise<Record<string, T>>
+
+interface QueryOneArgument<T> {
+	singleQuery: QueryOneFunction<T>;
+	bulkQuery?: QueryBulkFunction<T>;
+}
+
+interface QueryBulkArgument<T> {
+	singleQuery?: QueryOneFunction<T>;
+	bulkQuery: QueryBulkFunction<T>;
+}
+
+type QueryArgument<T> = QueryOneArgument<T> | QueryBulkArgument<T>
+
 interface Store<T> {
 	readonly get: (key: string) => MaybePromise<T | undefined>;
 	readonly set: (key: string, value: T, ttl?: number) => MaybePromise<unknown>;
@@ -16,17 +33,37 @@ export class Cache<T> {
 
 	private readonly _ttl: number | undefined
 
+	private readonly _singleQuery: QueryOneFunction<T>
+
+	private readonly _bulkQuery: QueryBulkFunction<T>
+
 	constructor(
-		readonly query: (key: string) => MaybePromise<T>,
+		readonly query: QueryArgument<T>,
 		options: Options<T> = {}
 	) {
 		this._store = options.store ?? new KeyValueInMemory()
 		this._ttl = options.ttl
-	}
 
-	async size(): Promise<number> {
-		const keys = await this._store.keys()
-		return keys.length
+		this._singleQuery = query.singleQuery ?? (async key => {
+			const result = await query.bulkQuery!([key])
+			return result[key]
+		})
+
+		this._bulkQuery = query.bulkQuery ?? (async (keys): Promise<Record<string, T>> => {
+			const entries = await Promise.all(keys
+				.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
+					const value = await query.singleQuery!(key)
+					return {key, value}
+				})
+			)
+
+			const result: Record<string, T> = {}
+			for (const {key, value} of entries) {
+				result[key] = value
+			}
+
+			return result
+		})
 	}
 
 	async get(key: string, forceQuery = false): Promise<T> {
@@ -37,43 +74,12 @@ export class Cache<T> {
 			}
 		}
 
-		const queried = await this.query(key)
-		await this._store.set(key, queried, this._ttl)
-		return queried
-	}
-}
-
-/**
- * Query can load multiple keys at once speeding up loading processes
- */
-export class BulkCache<T> {
-	private readonly _store: Store<T>
-
-	private readonly _ttl: number | undefined
-
-	constructor(
-		readonly query: (key: readonly string[]) => MaybePromise<Record<string, T>>,
-		options: Options<T> = {}
-	) {
-		this._store = options.store ?? new KeyValueInMemory()
-		this._ttl = options.ttl
-	}
-
-	async get(key: string, forceQuery = false): Promise<T> {
-		if (!forceQuery) {
-			const value = await this._store.get(key)
-			if (value) {
-				return value
-			}
-		}
-
-		const result = await this.query([key])
-		const queried = result[key]
+		const queried = await this._singleQuery(key)
 		await this._store.set(key, queried, this._ttl)
 		return queried
 	}
 
-	async preload(keys: readonly string[], force = false): Promise<void> {
+	async getMany(keys: readonly string[], force = false): Promise<Record<string, T>> {
 		let keysToBeLoaded: readonly string[]
 		if (force) {
 			keysToBeLoaded = keys
@@ -88,9 +94,18 @@ export class BulkCache<T> {
 				.filter((o): o is string => typeof o === 'string')
 		}
 
-		const results = await this.query(keysToBeLoaded)
-		await Promise.all(Object.keys(results)
-			.map(async key => this._store.set(key, results[key], this._ttl))
+		const queryResults = await this._bulkQuery(keysToBeLoaded)
+		await Promise.all(Object.keys(queryResults)
+			.map(async key => this._store.set(key, queryResults[key], this._ttl))
 		)
+
+		const resultEntries = await Promise.all(keys
+			.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
+				const value = await this._store.get(key)
+				return {key, value: value!}
+			})
+		)
+
+		return arrayToRecord(resultEntries)
 	}
 }
