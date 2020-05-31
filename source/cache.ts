@@ -2,9 +2,8 @@ import {MaybePromise} from './types'
 import {KeyValueInMemory} from './key-value'
 
 interface Store<T> {
-	readonly keys: () => MaybePromise<readonly string[]>;
 	readonly get: (key: string) => MaybePromise<T | undefined>;
-	readonly set: (key: string, value: T, ttl?: number) => MaybePromise<void>;
+	readonly set: (key: string, value: T, ttl?: number) => MaybePromise<unknown>;
 }
 
 export interface Options<T> {
@@ -58,11 +57,6 @@ export class BulkCache<T> {
 	) {
 		this._store = options.store ?? new KeyValueInMemory()
 		this._ttl = options.ttl
-	}
-
-	async size(): Promise<number> {
-		const keys = await this._store.keys()
-		return keys.length
 	}
 
 	async get(key: string, forceQuery = false): Promise<T> {
