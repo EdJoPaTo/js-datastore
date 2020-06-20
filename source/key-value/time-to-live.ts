@@ -21,7 +21,6 @@ export async function cleanupOld<T>(map: Readonly<ReadonlyMap<string, Entry<T>>>
 	const toBeDeleted: string[] = []
 
 	for (const [key, value] of map.entries()) {
-		console.log('cleanup old', key, value.until)
 		if (typeof value.until === 'number' && value.until < now) {
 			toBeDeleted.push(key)
 		}
