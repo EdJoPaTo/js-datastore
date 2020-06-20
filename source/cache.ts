@@ -94,14 +94,12 @@ export class Cache<T> {
 				.filter((o): o is string => typeof o === 'string')
 		}
 
-		if (keysToBeLoaded.length === 0) {
-			return {}
+		if (keysToBeLoaded.length > 0) {
+			const queryResults = await this._bulkQuery(keysToBeLoaded)
+			await Promise.all(Object.keys(queryResults)
+				.map(async key => this._store.set(key, queryResults[key], this._ttl))
+			)
 		}
-
-		const queryResults = await this._bulkQuery(keysToBeLoaded)
-		await Promise.all(Object.keys(queryResults)
-			.map(async key => this._store.set(key, queryResults[key], this._ttl))
-		)
 
 		const resultEntries = await Promise.all(keys
 			.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
