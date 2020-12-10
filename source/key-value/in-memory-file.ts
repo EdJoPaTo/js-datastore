@@ -15,9 +15,8 @@ export class KeyValueInMemoryFile<T> implements ExtendedStore<T> {
 		if (existsSync(this._filepath)) {
 			const raw = readFileSync(this._filepath, 'utf8')
 			const json = JSON.parse(raw)
-			const keys = Object.keys(json)
-			for (const key of keys) {
-				this._inMemoryStorage.set(key, json[key])
+			for (const [key, value] of Object.entries(json)) {
+				this._inMemoryStorage.set(key, value as T)
 			}
 		}
 	}

@@ -46,7 +46,7 @@ export class Cache<T> {
 
 		this._singleQuery = query.singleQuery ?? (async key => {
 			const result = await query.bulkQuery!([key])
-			return result[key]
+			return result[key]!
 		})
 
 		this._bulkQuery = query.bulkQuery ?? (async (keys): Promise<Record<string, T>> => {
@@ -96,8 +96,8 @@ export class Cache<T> {
 
 		if (keysToBeLoaded.length > 0) {
 			const queryResults = await this._bulkQuery(keysToBeLoaded)
-			await Promise.all(Object.keys(queryResults)
-				.map(async key => this._store.set(key, queryResults[key], this._ttl))
+			await Promise.all(Object.entries(queryResults)
+				.map(async ([key, value]) => this._store.set(key, value, this._ttl))
 			)
 		}
 
