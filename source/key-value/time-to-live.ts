@@ -10,7 +10,7 @@ export interface Entry<T> {
 
 export function createEntry<T>(value: T, ttl: number | undefined, now = Date.now()): Entry<T> {
 	if (typeof ttl !== 'number') {
-		return {value, until: Infinity}
+		return {value, until: Number.POSITIVE_INFINITY}
 	}
 
 	const until = now + ttl
