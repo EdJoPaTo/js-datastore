@@ -2,7 +2,6 @@
 
 [![NPM Version](https://img.shields.io/npm/v/@edjopato/datastore.svg)](https://www.npmjs.com/package/@edjopato/datastore)
 [![node](https://img.shields.io/node/v/@edjopato/datastore.svg)](https://www.npmjs.com/package/@edjopato/datastore)
-[![Build Status](https://travis-ci.com/EdJoPaTo/js-datastore.svg?branch=master)](https://travis-ci.com/EdJoPaTo/js-datastore)
 [![Dependency Status](https://david-dm.org/EdJoPaTo/js-datastore/status.svg)](https://david-dm.org/EdJoPaTo/js-datastore)
 [![Dev Dependency Status](https://david-dm.org/EdJoPaTo/js-datastore/dev-status.svg)](https://david-dm.org/EdJoPaTo/js-datastore?type=dev)
 
