@@ -97,6 +97,7 @@ export class Cache<T> {
 		if (keysToBeLoaded.length > 0) {
 			const queryResults = await this._bulkQuery(keysToBeLoaded)
 			await Promise.all(Object.entries(queryResults)
+				// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 				.map(async ([key, value]) => this._store.set(key, value, this._ttl))
 			)
 		}
