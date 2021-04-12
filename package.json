@@ -9,25 +9,13 @@
 		"email": "js-datastore-npm-package@edjopato.de",
 		"url": "https://edjopato.de"
 	},
-	"engines": {
-		"node": ">=10"
-	},
 	"scripts": {
 		"build": "del-cli dist && tsc",
 		"prepack": "npm run build",
 		"test": "tsc --sourceMap && xo"
 	},
-	"main": "dist",
-	"types": "dist",
-	"files": [
-		"dist",
-		"!*.test.*"
-	],
-	"keywords": [
-		"wikidata"
-	],
-	"publishConfig": {
-		"access": "public"
+	"engines": {
+		"node": ">=10"
 	},
 	"dependencies": {
 		"write-json-file": "^4.2.0"
@@ -38,6 +26,15 @@
 		"del-cli": "^3.0.0",
 		"typescript": "^4.1.2",
 		"xo": "^0.38.1"
+	},
+	"files": [
+		"dist",
+		"!*.test.*"
+	],
+	"main": "dist",
+	"types": "dist",
+	"publishConfig": {
+		"access": "public"
 	},
 	"xo": {
 		"semicolon": false,
