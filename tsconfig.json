@@ -5,7 +5,7 @@
 	],
 	"compilerOptions": {
 		"sourceMap": true,
-		"downlevelIteration": true,
+		"module": "CommonJS",
 		"outDir": "dist"
 	}
 }
