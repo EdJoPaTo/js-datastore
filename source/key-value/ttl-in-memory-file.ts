@@ -70,8 +70,8 @@ export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 
 	private _createFileContent(): Record<string, unknown> {
 		const json: Record<string, unknown> = {}
-		for (const key of this._inMemoryStorage.keys()) {
-			json[key] = this._inMemoryStorage.get(key)!
+		for (const [key, value] of this._inMemoryStorage.entries()) {
+			json[key] = value
 		}
 
 		return json
