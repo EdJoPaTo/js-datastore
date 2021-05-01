@@ -40,7 +40,6 @@
 	"xo": {
 		"semicolon": false,
 		"rules": {
-			"@typescript-eslint/class-literal-property-style": "off",
 			"@typescript-eslint/prefer-readonly-parameter-types": "error"
 		}
 	}

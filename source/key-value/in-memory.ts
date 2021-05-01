@@ -1,7 +1,9 @@
 import {ExtendedStore} from './type'
 
 export class KeyValueInMemory<T> implements ExtendedStore<T> {
-	readonly ttlSupport = false
+	get ttlSupport() {
+		return false
+	}
 
 	private readonly _inMemoryStorage: Map<string, T> = new Map()
 

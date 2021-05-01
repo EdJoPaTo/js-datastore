@@ -5,7 +5,9 @@ import {ExtendedStore} from './type'
 import writeJsonFile = require('write-json-file')
 
 export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
-	readonly ttlSupport = false
+	get ttlSupport() {
+		return false
+	}
 
 	private readonly _inMemoryStorage: Map<string, T> = new Map()
 

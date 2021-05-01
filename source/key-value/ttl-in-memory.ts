@@ -2,7 +2,9 @@ import {Entry, createEntry, cleanupOld} from './time-to-live'
 import {ExtendedStore} from './type'
 
 export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
-	readonly ttlSupport = true
+	get ttlSupport() {
+		return true
+	}
 
 	private readonly _inMemoryStorage: Map<string, Entry<T>> = new Map()
 
