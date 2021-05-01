@@ -45,13 +45,16 @@ export class Cache<T> {
 		this._ttl = options.ttl
 
 		this._singleQuery = query.singleQuery ?? (async key => {
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const result = await query.bulkQuery!([key])
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			return result[key]!
 		})
 
 		this._bulkQuery = query.bulkQuery ?? (async (keys): Promise<Record<string, T>> => {
 			const entries = await Promise.all(keys
 				.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 					const value = await query.singleQuery!(key)
 					return {key, value}
 				})
@@ -105,6 +108,7 @@ export class Cache<T> {
 		const resultEntries = await Promise.all(keys
 			.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
 				const value = await this._store.get(key)
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				return {key, value: value!}
 			})
 		)
