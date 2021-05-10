@@ -16,7 +16,7 @@
 	},
 	"type": "commonjs",
 	"engines": {
-		"node": ">=10"
+		"node": ">=12"
 	},
 	"dependencies": {
 		"write-json-file": "^4.2.0"
