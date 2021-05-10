@@ -5,7 +5,7 @@ export class KeyValueInMemory<T> implements ExtendedStore<T> {
 		return false
 	}
 
-	private readonly _inMemoryStorage: Map<string, T> = new Map()
+	private readonly _inMemoryStorage = new Map<string, T>()
 
 	keys(): readonly string[] {
 		return [...this._inMemoryStorage.keys()]

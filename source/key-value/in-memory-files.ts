@@ -1,15 +1,15 @@
 import {mkdirSync, readdirSync, readFileSync, unlinkSync, existsSync} from 'fs'
 
-import {ExtendedStore} from './type'
+import writeJsonFile from 'write-json-file'
 
-import writeJsonFile = require('write-json-file')
+import {ExtendedStore} from './type'
 
 export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 	get ttlSupport() {
 		return false
 	}
 
-	private readonly _inMemoryStorage: Map<string, T> = new Map()
+	private readonly _inMemoryStorage = new Map<string, T>()
 
 	constructor(
 		private readonly _directory: string
@@ -61,7 +61,7 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 
 	private _getFromFS(key: string): T {
 		const content = readFileSync(this._pathOfKey(key), 'utf8')
-		const json = JSON.parse(content)
+		const json = JSON.parse(content) as T
 		return json
 	}
 }

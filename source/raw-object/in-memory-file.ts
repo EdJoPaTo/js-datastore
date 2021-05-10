@@ -1,8 +1,8 @@
 import {readFileSync, unlinkSync, existsSync} from 'fs'
 
-import {RawObjectStorage} from './type'
+import writeJsonFile from 'write-json-file'
 
-import writeJsonFile = require('write-json-file')
+import {RawObjectStorage} from './type'
 
 export class RawObjectInMemoryFile<T> implements RawObjectStorage<T> {
 	private _content: T | undefined
@@ -12,7 +12,7 @@ export class RawObjectInMemoryFile<T> implements RawObjectStorage<T> {
 	) {
 		if (existsSync(this._filepath)) {
 			const raw = readFileSync(this._filepath, 'utf8')
-			const json = JSON.parse(raw)
+			const json = JSON.parse(raw) as T
 			this._content = json
 		}
 	}

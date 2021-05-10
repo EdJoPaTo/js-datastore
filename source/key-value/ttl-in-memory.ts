@@ -6,7 +6,7 @@ export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
 		return true
 	}
 
-	private readonly _inMemoryStorage: Map<string, Entry<T>> = new Map()
+	private readonly _inMemoryStorage = new Map<string, Entry<T>>()
 
 	constructor(
 		cleanupIntervalMilliseconds: number = 5 * 60 * 1000

@@ -1,16 +1,16 @@
 import {readFileSync, unlinkSync, existsSync} from 'fs'
 
+import writeJsonFile from 'write-json-file'
+
 import {Entry, createEntry, cleanupOld} from './time-to-live'
 import {ExtendedStore} from './type'
-
-import writeJsonFile = require('write-json-file')
 
 export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 	get ttlSupport() {
 		return true
 	}
 
-	private readonly _inMemoryStorage: Map<string, Entry<T>> = new Map()
+	private readonly _inMemoryStorage = new Map<string, Entry<T>>()
 
 	constructor(
 		private readonly _filepath: string,
