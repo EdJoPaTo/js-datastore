@@ -9,7 +9,7 @@ export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
 	private readonly _inMemoryStorage = new Map<string, Entry<T>>()
 
 	constructor(
-		cleanupIntervalMilliseconds: number = 5 * 60 * 1000
+		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
 	) {
 		if (cleanupIntervalMilliseconds && Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
 			setInterval(async () => this._cleanupOld(), cleanupIntervalMilliseconds)

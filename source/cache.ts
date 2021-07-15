@@ -39,25 +39,22 @@ export class Cache<T> {
 
 	constructor(
 		readonly query: QueryArgument<T>,
-		options: Options<T> = {}
+		options: Options<T> = {},
 	) {
 		this._store = options.store ?? new KeyValueInMemory()
 		this._ttl = options.ttl
 
 		this._singleQuery = query.singleQuery ?? (async key => {
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const result = await query.bulkQuery!([key])
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			return result[key]!
 		})
 
 		this._bulkQuery = query.bulkQuery ?? (async (keys): Promise<Record<string, T>> => {
 			const entries = await Promise.all(keys
 				.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 					const value = await query.singleQuery!(key)
 					return {key, value}
-				})
+				}),
 			)
 
 			const result: Record<string, T> = {}
@@ -91,7 +88,7 @@ export class Cache<T> {
 				.map(async key => {
 					const missing = (await this._store.get(key)) === undefined
 					return missing ? key : undefined
-				})
+				}),
 			)
 			keysToBeLoaded = missingKeys
 				.filter((o): o is string => typeof o === 'string')
@@ -101,16 +98,15 @@ export class Cache<T> {
 			const queryResults = await this._bulkQuery(keysToBeLoaded)
 			await Promise.all(Object.entries(queryResults)
 				// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-				.map(async ([key, value]) => this._store.set(key, value, this._ttl))
+				.map(async ([key, value]) => this._store.set(key, value, this._ttl)),
 			)
 		}
 
 		const resultEntries = await Promise.all(keys
 			.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
 				const value = await this._store.get(key)
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				return {key, value: value!}
-			})
+			}),
 		)
 
 		return arrayToRecord(resultEntries)

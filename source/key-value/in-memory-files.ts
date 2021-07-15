@@ -12,7 +12,7 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 	private readonly _inMemoryStorage = new Map<string, T>()
 
 	constructor(
-		private readonly _directory: string
+		private readonly _directory: string,
 	) {
 		mkdirSync(_directory, {recursive: true})
 

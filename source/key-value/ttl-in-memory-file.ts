@@ -14,7 +14,7 @@ export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 
 	constructor(
 		private readonly _filepath: string,
-		cleanupIntervalMilliseconds: number = 5 * 60 * 1000
+		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
 	) {
 		if (existsSync(this._filepath)) {
 			const raw = readFileSync(this._filepath, 'utf8')

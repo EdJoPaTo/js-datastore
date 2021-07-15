@@ -12,7 +12,7 @@ export class KeyValueInMemoryFile<T> implements ExtendedStore<T> {
 	private readonly _inMemoryStorage = new Map<string, T>()
 
 	constructor(
-		private readonly _filepath: string
+		private readonly _filepath: string,
 	) {
 		if (existsSync(this._filepath)) {
 			const raw = readFileSync(this._filepath, 'utf8')

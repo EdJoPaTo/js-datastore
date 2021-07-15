@@ -8,7 +8,7 @@ export class RawObjectInMemoryFile<T> implements RawObjectStorage<T> {
 	private _content: T | undefined
 
 	constructor(
-		private readonly _filepath: string
+		private readonly _filepath: string,
 	) {
 		if (existsSync(this._filepath)) {
 			const raw = readFileSync(this._filepath, 'utf8')

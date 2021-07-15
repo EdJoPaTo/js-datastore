@@ -14,7 +14,7 @@ export class TtlKeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 
 	constructor(
 		private readonly _directory: string,
-		cleanupIntervalMilliseconds: number = 5 * 60 * 1000
+		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
 	) {
 		mkdirSync(_directory, {recursive: true})
 
