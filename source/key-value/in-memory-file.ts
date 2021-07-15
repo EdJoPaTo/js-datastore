@@ -9,54 +9,54 @@ export class KeyValueInMemoryFile<T> implements ExtendedStore<T> {
 		return false
 	}
 
-	private readonly _inMemoryStorage = new Map<string, T>()
+	readonly #inMemoryStorage = new Map<string, T>()
 
 	constructor(
-		private readonly _filepath: string,
+		private readonly filepath: string,
 	) {
-		if (existsSync(this._filepath)) {
-			const raw = readFileSync(this._filepath, 'utf8')
+		if (existsSync(this.filepath)) {
+			const raw = readFileSync(this.filepath, 'utf8')
 			const json = JSON.parse(raw) as T[]
 			for (const [key, value] of Object.entries(json)) {
-				this._inMemoryStorage.set(key, value)
+				this.#inMemoryStorage.set(key, value)
 			}
 		}
 	}
 
 	keys(): readonly string[] {
-		return [...this._inMemoryStorage.keys()]
+		return [...this.#inMemoryStorage.keys()]
 	}
 
 	get(key: string): T | undefined {
-		return this._inMemoryStorage.get(key)
+		return this.#inMemoryStorage.get(key)
 	}
 
 	async set(key: string, value: T): Promise<void> {
-		this._inMemoryStorage.set(key, value)
-		await writeJsonFile(this._filepath, this._createFileContent(), {sortKeys: true})
+		this.#inMemoryStorage.set(key, value)
+		await writeJsonFile(this.filepath, this.#createFileContent(), {sortKeys: true})
 	}
 
 	async delete(key: string): Promise<boolean> {
-		const result = this._inMemoryStorage.delete(key)
-		if (this._inMemoryStorage.size > 0) {
-			await writeJsonFile(this._filepath, this._createFileContent(), {sortKeys: true})
-		} else if (existsSync(this._filepath)) {
-			unlinkSync(this._filepath)
+		const result = this.#inMemoryStorage.delete(key)
+		if (this.#inMemoryStorage.size > 0) {
+			await writeJsonFile(this.filepath, this.#createFileContent(), {sortKeys: true})
+		} else if (existsSync(this.filepath)) {
+			unlinkSync(this.filepath)
 		}
 
 		return result
 	}
 
 	clear(): void {
-		this._inMemoryStorage.clear()
-		if (existsSync(this._filepath)) {
-			unlinkSync(this._filepath)
+		this.#inMemoryStorage.clear()
+		if (existsSync(this.filepath)) {
+			unlinkSync(this.filepath)
 		}
 	}
 
-	private _createFileContent(): Record<string, unknown> {
+	#createFileContent(): Record<string, unknown> {
 		const json: Record<string, unknown> = {}
-		for (const [key, value] of this._inMemoryStorage.entries()) {
+		for (const [key, value] of this.#inMemoryStorage.entries()) {
 			json[key] = value
 		}
 

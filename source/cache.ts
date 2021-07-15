@@ -29,27 +29,27 @@ export interface Options<T> {
 }
 
 export class Cache<T> {
-	private readonly _store: Store<T>
+	readonly #store: Store<T>
 
-	private readonly _ttl: number | undefined
+	readonly #ttl: number | undefined
 
-	private readonly _singleQuery: QueryOneFunction<T>
+	readonly #singleQuery: QueryOneFunction<T>
 
-	private readonly _bulkQuery: QueryBulkFunction<T>
+	readonly #bulkQuery: QueryBulkFunction<T>
 
 	constructor(
 		readonly query: QueryArgument<T>,
 		options: Options<T> = {},
 	) {
-		this._store = options.store ?? new KeyValueInMemory()
-		this._ttl = options.ttl
+		this.#store = options.store ?? new KeyValueInMemory()
+		this.#ttl = options.ttl
 
-		this._singleQuery = query.singleQuery ?? (async key => {
+		this.#singleQuery = query.singleQuery ?? (async key => {
 			const result = await query.bulkQuery!([key])
 			return result[key]!
 		})
 
-		this._bulkQuery = query.bulkQuery ?? (async (keys): Promise<Record<string, T>> => {
+		this.#bulkQuery = query.bulkQuery ?? (async (keys): Promise<Record<string, T>> => {
 			const entries = await Promise.all(keys
 				.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
 					const value = await query.singleQuery!(key)
@@ -68,14 +68,14 @@ export class Cache<T> {
 
 	async get(key: string, forceQuery = false): Promise<T> {
 		if (!forceQuery) {
-			const value = await this._store.get(key)
+			const value = await this.#store.get(key)
 			if (value) {
 				return value
 			}
 		}
 
-		const queried = await this._singleQuery(key)
-		await this._store.set(key, queried, this._ttl)
+		const queried = await this.#singleQuery(key)
+		await this.#store.set(key, queried, this.#ttl)
 		return queried
 	}
 
@@ -86,7 +86,7 @@ export class Cache<T> {
 		} else {
 			const missingKeys = await Promise.all(keys
 				.map(async key => {
-					const missing = (await this._store.get(key)) === undefined
+					const missing = (await this.#store.get(key)) === undefined
 					return missing ? key : undefined
 				}),
 			)
@@ -95,16 +95,16 @@ export class Cache<T> {
 		}
 
 		if (keysToBeLoaded.length > 0) {
-			const queryResults = await this._bulkQuery(keysToBeLoaded)
+			const queryResults = await this.#bulkQuery(keysToBeLoaded)
 			await Promise.all(Object.entries(queryResults)
 				// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-				.map(async ([key, value]) => this._store.set(key, value, this._ttl)),
+				.map(async ([key, value]) => this.#store.set(key, value, this.#ttl)),
 			)
 		}
 
 		const resultEntries = await Promise.all(keys
 			.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
-				const value = await this._store.get(key)
+				const value = await this.#store.get(key)
 				return {key, value: value!}
 			}),
 		)

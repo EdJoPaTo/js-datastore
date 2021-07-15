@@ -6,23 +6,23 @@ export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
 		return true
 	}
 
-	private readonly _inMemoryStorage = new Map<string, Entry<T>>()
+	readonly #inMemoryStorage = new Map<string, Entry<T>>()
 
 	constructor(
 		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
 	) {
 		if (cleanupIntervalMilliseconds && Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
-			setInterval(async () => this._cleanupOld(), cleanupIntervalMilliseconds)
+			setInterval(async () => this.#cleanupOld(), cleanupIntervalMilliseconds)
 		}
 	}
 
 	keys(): readonly string[] {
-		return [...this._inMemoryStorage.keys()]
+		return [...this.#inMemoryStorage.keys()]
 	}
 
 	get(key: string): T | undefined {
 		const now = Date.now()
-		const entry = this._inMemoryStorage.get(key)
+		const entry = this.#inMemoryStorage.get(key)
 		if (entry?.until && entry.until > now) {
 			return entry.value
 		}
@@ -31,18 +31,18 @@ export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
 	}
 
 	set(key: string, value: T, ttl?: number): void {
-		this._inMemoryStorage.set(key, createEntry(value, ttl))
+		this.#inMemoryStorage.set(key, createEntry(value, ttl))
 	}
 
 	delete(key: string): boolean {
-		return this._inMemoryStorage.delete(key)
+		return this.#inMemoryStorage.delete(key)
 	}
 
 	clear(): void {
-		this._inMemoryStorage.clear()
+		this.#inMemoryStorage.clear()
 	}
 
-	private async _cleanupOld(): Promise<void> {
-		await cleanupOld(this._inMemoryStorage, key => this.delete(key))
+	async #cleanupOld(): Promise<void> {
+		await cleanupOld(this.#inMemoryStorage, key => this.delete(key))
 	}
 }

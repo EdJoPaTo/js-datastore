@@ -5,31 +5,31 @@ import writeJsonFile from 'write-json-file'
 import {RawObjectStorage} from './type'
 
 export class RawObjectInMemoryFile<T> implements RawObjectStorage<T> {
-	private _content: T | undefined
+	#content: T | undefined
 
 	constructor(
-		private readonly _filepath: string,
+		private readonly filepath: string,
 	) {
-		if (existsSync(this._filepath)) {
-			const raw = readFileSync(this._filepath, 'utf8')
+		if (existsSync(this.filepath)) {
+			const raw = readFileSync(this.filepath, 'utf8')
 			const json = JSON.parse(raw) as T
-			this._content = json
+			this.#content = json
 		}
 	}
 
 	get(): T | undefined {
-		return this._content
+		return this.#content
 	}
 
 	async set(value: T): Promise<void> {
-		this._content = value
-		await writeJsonFile(this._filepath, value, {sortKeys: true})
+		this.#content = value
+		await writeJsonFile(this.filepath, value, {sortKeys: true})
 	}
 
 	delete(): void {
-		this._content = undefined
-		if (existsSync(this._filepath)) {
-			unlinkSync(this._filepath)
+		this.#content = undefined
+		if (existsSync(this.filepath)) {
+			unlinkSync(this.filepath)
 		}
 	}
 }

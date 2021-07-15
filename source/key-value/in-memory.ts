@@ -5,25 +5,25 @@ export class KeyValueInMemory<T> implements ExtendedStore<T> {
 		return false
 	}
 
-	private readonly _inMemoryStorage = new Map<string, T>()
+	readonly #inMemoryStorage = new Map<string, T>()
 
 	keys(): readonly string[] {
-		return [...this._inMemoryStorage.keys()]
+		return [...this.#inMemoryStorage.keys()]
 	}
 
 	get(key: string): T | undefined {
-		return this._inMemoryStorage.get(key)
+		return this.#inMemoryStorage.get(key)
 	}
 
 	set(key: string, value: T): void {
-		this._inMemoryStorage.set(key, value)
+		this.#inMemoryStorage.set(key, value)
 	}
 
 	delete(key: string): boolean {
-		return this._inMemoryStorage.delete(key)
+		return this.#inMemoryStorage.delete(key)
 	}
 
 	clear(): void {
-		this._inMemoryStorage.clear()
+		this.#inMemoryStorage.clear()
 	}
 }

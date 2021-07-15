@@ -9,36 +9,36 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		return false
 	}
 
-	private readonly _inMemoryStorage = new Map<string, T>()
+	readonly #inMemoryStorage = new Map<string, T>()
 
 	constructor(
-		private readonly _directory: string,
+		private readonly directory: string,
 	) {
-		mkdirSync(_directory, {recursive: true})
+		mkdirSync(directory, {recursive: true})
 
-		const entries = this._listFromFS()
+		const entries = this.#listFromFS()
 		for (const entry of entries) {
-			this._inMemoryStorage.set(entry, this._getFromFS(entry))
+			this.#inMemoryStorage.set(entry, this.#getFromFS(entry))
 		}
 	}
 
 	keys(): readonly string[] {
-		return [...this._inMemoryStorage.keys()]
+		return [...this.#inMemoryStorage.keys()]
 	}
 
 	get(key: string): T | undefined {
-		return this._inMemoryStorage.get(key)
+		return this.#inMemoryStorage.get(key)
 	}
 
 	async set(key: string, value: T): Promise<void> {
-		this._inMemoryStorage.set(key, value)
-		await writeJsonFile(this._pathOfKey(key), value, {sortKeys: true})
+		this.#inMemoryStorage.set(key, value)
+		await writeJsonFile(this.#pathOfKey(key), value, {sortKeys: true})
 	}
 
 	delete(key: string): boolean {
-		const result = this._inMemoryStorage.delete(key)
-		if (existsSync(this._pathOfKey(key))) {
-			unlinkSync(this._pathOfKey(key))
+		const result = this.#inMemoryStorage.delete(key)
+		if (existsSync(this.#pathOfKey(key))) {
+			unlinkSync(this.#pathOfKey(key))
 		}
 
 		return result
@@ -50,17 +50,17 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		}
 	}
 
-	private _pathOfKey(key: string): string {
-		return `${this._directory}/${key}.json`
+	#pathOfKey(key: string): string {
+		return `${this.directory}/${key}.json`
 	}
 
-	private _listFromFS(): readonly string[] {
-		return readdirSync(this._directory)
+	#listFromFS(): readonly string[] {
+		return readdirSync(this.directory)
 			.map(o => o.replace('.json', ''))
 	}
 
-	private _getFromFS(key: string): T {
-		const content = readFileSync(this._pathOfKey(key), 'utf8')
+	#getFromFS(key: string): T {
+		const content = readFileSync(this.#pathOfKey(key), 'utf8')
 		const json = JSON.parse(content) as T
 		return json
 	}
