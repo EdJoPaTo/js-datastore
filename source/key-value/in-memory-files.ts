@@ -1,6 +1,6 @@
 import {mkdirSync, readdirSync, readFileSync, unlinkSync, existsSync} from 'fs'
 
-import writeJsonFile from 'write-json-file'
+import {writeJsonFile} from '../write.js'
 
 import {ExtendedStore} from './type'
 
@@ -32,7 +32,7 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 
 	async set(key: string, value: T): Promise<void> {
 		this.#inMemoryStorage.set(key, value)
-		await writeJsonFile(this.#pathOfKey(key), value, {sortKeys: true})
+		await writeJsonFile(this.#pathOfKey(key), value)
 	}
 
 	delete(key: string): boolean {

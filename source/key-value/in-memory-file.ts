@@ -1,6 +1,6 @@
 import {readFileSync, unlinkSync, existsSync} from 'fs'
 
-import writeJsonFile from 'write-json-file'
+import {writeJsonFile} from '../write.js'
 
 import {ExtendedStore} from './type'
 
@@ -33,13 +33,13 @@ export class KeyValueInMemoryFile<T> implements ExtendedStore<T> {
 
 	async set(key: string, value: T): Promise<void> {
 		this.#inMemoryStorage.set(key, value)
-		await writeJsonFile(this.filepath, this.#createFileContent(), {sortKeys: true})
+		await writeJsonFile(this.filepath, this.#createFileContent())
 	}
 
 	async delete(key: string): Promise<boolean> {
 		const result = this.#inMemoryStorage.delete(key)
 		if (this.#inMemoryStorage.size > 0) {
-			await writeJsonFile(this.filepath, this.#createFileContent(), {sortKeys: true})
+			await writeJsonFile(this.filepath, this.#createFileContent())
 		} else if (existsSync(this.filepath)) {
 			unlinkSync(this.filepath)
 		}

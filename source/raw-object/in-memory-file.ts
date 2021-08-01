@@ -1,6 +1,6 @@
 import {readFileSync, unlinkSync, existsSync} from 'fs'
 
-import writeJsonFile from 'write-json-file'
+import {writeJsonFile} from '../write.js'
 
 import {RawObjectStorage} from './type'
 
@@ -23,7 +23,7 @@ export class RawObjectInMemoryFile<T> implements RawObjectStorage<T> {
 
 	async set(value: T): Promise<void> {
 		this.#content = value
-		await writeJsonFile(this.filepath, value, {sortKeys: true})
+		await writeJsonFile(this.filepath, value)
 	}
 
 	delete(): void {
