@@ -16,9 +16,9 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 	) {
 		mkdirSync(directory, {recursive: true})
 
-		const entries = this.#listFromFS()
+		const entries = this.#listFromFilesystem()
 		for (const entry of entries) {
-			this.#inMemoryStorage.set(entry, this.#getFromFS(entry))
+			this.#inMemoryStorage.set(entry, this.#getFromFilesystem(entry))
 		}
 	}
 
@@ -54,12 +54,12 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		return `${this.directory}/${key}.json`
 	}
 
-	#listFromFS(): readonly string[] {
+	#listFromFilesystem(): readonly string[] {
 		return readdirSync(this.directory)
 			.map(o => o.replace('.json', ''))
 	}
 
-	#getFromFS(key: string): T {
+	#getFromFilesystem(key: string): T {
 		const content = readFileSync(this.#pathOfKey(key), 'utf8')
 		const json = JSON.parse(content) as T
 		return json
