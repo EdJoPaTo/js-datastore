@@ -43,9 +43,9 @@
 	"xo": {
 		"semicolon": false,
 		"rules": {
-			"import/extensions": "off",
-			"unicorn/prefer-node-protocol": "off",
-			"@typescript-eslint/prefer-readonly-parameter-types": "error"
+			"@typescript-eslint/prefer-readonly-parameter-types": "error",
+			"import/extensions": ["error", "never"],
+			"unicorn/prefer-node-protocol": "off"
 		}
 	}
 }
