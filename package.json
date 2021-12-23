@@ -29,7 +29,7 @@
 		"@types/write-file-atomic": "^3.0.2",
 		"del-cli": "^4.0.0",
 		"typescript": "^4.2.3",
-		"xo": "^0.46.3"
+		"xo": "^0.47.0"
 	},
 	"files": [
 		"dist",
@@ -43,6 +43,7 @@
 	"xo": {
 		"semicolon": false,
 		"rules": {
+			"import/extensions": "off",
 			"unicorn/prefer-node-protocol": "off",
 			"@typescript-eslint/prefer-readonly-parameter-types": "error"
 		}
