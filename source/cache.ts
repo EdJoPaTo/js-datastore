@@ -7,13 +7,13 @@ export type QueryOneFunction<T> = (key: string) => MaybePromise<T>
 export type QueryBulkFunction<T> = (keys: readonly string[]) => MaybePromise<Record<string, T>>
 
 interface QueryOneArgument<T> {
-	singleQuery: QueryOneFunction<T>;
-	bulkQuery?: QueryBulkFunction<T>;
+	readonly singleQuery: QueryOneFunction<T>;
+	readonly bulkQuery?: QueryBulkFunction<T>;
 }
 
 interface QueryBulkArgument<T> {
-	singleQuery?: QueryOneFunction<T>;
-	bulkQuery: QueryBulkFunction<T>;
+	readonly singleQuery?: QueryOneFunction<T>;
+	readonly bulkQuery: QueryBulkFunction<T>;
 }
 
 type QueryArgument<T> = QueryOneArgument<T> | QueryBulkArgument<T>
