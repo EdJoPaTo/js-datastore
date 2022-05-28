@@ -23,7 +23,7 @@
 		"write-file-atomic": "^4.0.0"
 	},
 	"devDependencies": {
-		"@sindresorhus/tsconfig": "^2.0.0",
+		"@sindresorhus/tsconfig": "^3.0.0",
 		"@types/json-stable-stringify": "^1.0.33",
 		"@types/node": "^12.20.36",
 		"@types/write-file-atomic": "^4.0.0",
