@@ -1,3 +1,3 @@
-export * from './type'
+export * from './type.js'
 
-export * from './in-memory-file'
+export * from './in-memory-file.js'

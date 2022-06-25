@@ -1,9 +1,9 @@
-import {readFileSync, unlinkSync, existsSync} from 'fs'
+import {readFileSync, unlinkSync, existsSync} from 'node:fs'
 
 import {writeJsonFile} from '../write.js'
 
-import {Entry, createEntry, cleanupOld} from './time-to-live'
-import {ExtendedStore} from './type'
+import {Entry, createEntry, cleanupOld} from './time-to-live.js'
+import {ExtendedStore} from './type.js'
 
 export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 	get ttlSupport() {

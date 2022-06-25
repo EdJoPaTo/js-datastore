@@ -1,5 +1,5 @@
-import {Entry, createEntry, cleanupOld} from './time-to-live'
-import {ExtendedStore} from './type'
+import {Entry, createEntry, cleanupOld} from './time-to-live.js'
+import {ExtendedStore} from './type.js'
 
 export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
 	get ttlSupport() {

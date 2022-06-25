@@ -1,4 +1,4 @@
-import {MaybePromise} from '../types'
+import {MaybePromise} from '../types.js'
 
 export interface RawObjectStorage<T> {
 	readonly delete: () => MaybePromise<void>;

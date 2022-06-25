@@ -1,4 +1,4 @@
-import {MaybePromise} from '../types'
+import {MaybePromise} from '../types.js'
 
 export interface Entry<T> {
 	readonly value: T;

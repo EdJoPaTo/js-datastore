@@ -1,4 +1,4 @@
-import {MaybePromise} from '../types'
+import {MaybePromise} from '../types.js'
 
 // Do not export this.
 // Either the user wants to use a specific implementation or define the minimal required Store themselves.

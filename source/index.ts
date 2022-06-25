@@ -1,5 +1,5 @@
-export * from './key-value'
-export * from './raw-object'
+export * from './key-value/index.js'
+export * from './raw-object/index.js'
 
-export * from './cache'
-export * from './transform'
+export * from './cache.js'
+export * from './transform.js'

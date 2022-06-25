@@ -1,7 +1,7 @@
-import {MaybePromise} from './types'
-import {KeyValueInMemory} from './key-value'
+import {MaybePromise} from './types.js'
+import {KeyValueInMemory} from './key-value/index.js'
 
-import {arrayToRecord} from './transform'
+import {arrayToRecord} from './transform.js'
 
 export type QueryOneFunction<T> = (key: string) => MaybePromise<T>
 export type QueryBulkFunction<T> = (keys: readonly string[]) => MaybePromise<Record<string, T>>
