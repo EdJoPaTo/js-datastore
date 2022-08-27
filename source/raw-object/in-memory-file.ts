@@ -1,8 +1,6 @@
-import {readFileSync, unlinkSync, existsSync} from 'node:fs'
-
+import {existsSync, readFileSync, unlinkSync} from 'node:fs'
 import {writeJsonFile} from '../write.js'
-
-import {RawObjectStorage} from './type.js'
+import type {RawObjectStorage} from './type.js'
 
 export class RawObjectInMemoryFile<T> implements RawObjectStorage<T> {
 	#content: T | undefined

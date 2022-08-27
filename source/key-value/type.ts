@@ -1,4 +1,4 @@
-import {MaybePromise} from '../types.js'
+import type {MaybePromise} from '../types.js'
 
 // Do not export this.
 // Either the user wants to use a specific implementation or define the minimal required Store themselves.
@@ -12,7 +12,7 @@ import {MaybePromise} from '../types.js'
 /**
  * Keyv compatible Store. See https://github.com/lukechilds/keyv
  */
-export interface Store<T> {
+export type Store<T> = {
 	readonly ttlSupport: boolean;
 
 	/**
@@ -39,7 +39,7 @@ export interface Store<T> {
 	readonly clear: () => MaybePromise<void>;
 }
 
-export interface ExtendedStore<T> extends Store<T> {
+export type ExtendedStore<T> = Store<T> & {
 	/**
 	 * Return all currently set keys
 	 */

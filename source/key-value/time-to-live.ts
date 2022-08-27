@@ -1,14 +1,16 @@
-import {MaybePromise} from '../types.js'
+import type {MaybePromise} from '../types.js'
 
-export interface Entry<T> {
+export type Entry<T> = {
 	readonly value: T;
-	/**
-	 * Is undefined when endless (unspecified ttl)
-	 */
+	/** Is undefined when endless (unspecified ttl) */
 	readonly until: number | undefined;
 }
 
-export function createEntry<T>(value: T, ttl: number | undefined, now = Date.now()): Entry<T> {
+export function createEntry<T>(
+	value: T,
+	ttl: number | undefined,
+	now = Date.now(),
+): Entry<T> {
 	if (typeof ttl !== 'number') {
 		return {value, until: Number.POSITIVE_INFINITY}
 	}
@@ -17,7 +19,11 @@ export function createEntry<T>(value: T, ttl: number | undefined, now = Date.now
 	return {value, until}
 }
 
-export async function cleanupOld<T>(map: Readonly<ReadonlyMap<string, Entry<T>>>, deleteFunction: (key: string) => MaybePromise<boolean>, now = Date.now()): Promise<void> {
+export async function cleanupOld<T>(
+	map: Readonly<ReadonlyMap<string, Entry<T>>>,
+	deleteFunction: (key: string) => MaybePromise<boolean>,
+	now = Date.now(),
+): Promise<void> {
 	const toBeDeleted: string[] = []
 
 	for (const [key, value] of map.entries()) {

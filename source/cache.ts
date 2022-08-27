@@ -1,31 +1,53 @@
-import {MaybePromise} from './types.js'
-import {KeyValueInMemory} from './key-value/index.js'
-
 import {arrayToRecord} from './transform.js'
+import {KeyValueInMemory} from './key-value/index.js'
+import type {MaybePromise} from './types.js'
 
 export type QueryOneFunction<T> = (key: string) => MaybePromise<T>
-export type QueryBulkFunction<T> = (keys: readonly string[]) => MaybePromise<Record<string, T>>
+export type QueryBulkFunction<T> = (
+	keys: readonly string[],
+) => MaybePromise<Record<string, T>>
 
-interface QueryOneArgument<T> {
+type QueryOneArgument<T> = {
 	readonly singleQuery: QueryOneFunction<T>;
 	readonly bulkQuery?: QueryBulkFunction<T>;
 }
 
-interface QueryBulkArgument<T> {
+type QueryBulkArgument<T> = {
 	readonly singleQuery?: QueryOneFunction<T>;
 	readonly bulkQuery: QueryBulkFunction<T>;
 }
 
 type QueryArgument<T> = QueryOneArgument<T> | QueryBulkArgument<T>
 
-interface Store<T> {
+type Store<T> = {
 	readonly get: (key: string) => MaybePromise<T | undefined>;
 	readonly set: (key: string, value: T, ttl?: number) => MaybePromise<unknown>;
 }
 
-export interface Options<T> {
+export type Options<T> = {
 	readonly store?: Store<T>;
 	readonly ttl?: number;
+}
+
+function generateFallbackBulk<T>(
+	singleQuery: QueryOneFunction<T>,
+): QueryBulkFunction<T> {
+	return async keys => {
+		const entries = await Promise.all(keys
+			.map(
+				async (key): Promise<{readonly key: string; readonly value: T}> => {
+					const value = await singleQuery(key)
+					return {key, value}
+				},
+			))
+
+		const result: Record<string, T> = {}
+		for (const {key, value} of entries) {
+			result[key] = value
+		}
+
+		return result
+	}
 }
 
 export class Cache<T> {
@@ -49,21 +71,7 @@ export class Cache<T> {
 			return result[key]!
 		})
 
-		this.#bulkQuery = query.bulkQuery ?? (async (keys): Promise<Record<string, T>> => {
-			const entries = await Promise.all(keys
-				.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
-					const value = await query.singleQuery!(key)
-					return {key, value}
-				}),
-			)
-
-			const result: Record<string, T> = {}
-			for (const {key, value} of entries) {
-				result[key] = value
-			}
-
-			return result
-		})
+		this.#bulkQuery = query.bulkQuery ?? generateFallbackBulk(query.singleQuery!)
 	}
 
 	async get(key: string, forceQuery = false): Promise<T> {
@@ -79,7 +87,10 @@ export class Cache<T> {
 		return queried
 	}
 
-	async getMany(keys: readonly string[], force = false): Promise<Record<string, T>> {
+	async getMany(
+		keys: readonly string[],
+		force = false,
+	): Promise<Record<string, T>> {
 		let keysToBeLoaded: readonly string[]
 		if (force) {
 			keysToBeLoaded = keys
@@ -88,8 +99,7 @@ export class Cache<T> {
 				.map(async key => {
 					const missing = (await this.#store.get(key)) === undefined
 					return missing ? key : undefined
-				}),
-			)
+				}))
 			keysToBeLoaded = missingKeys
 				.filter((o): o is string => typeof o === 'string')
 		}
@@ -102,12 +112,12 @@ export class Cache<T> {
 			)
 		}
 
-		const resultEntries = await Promise.all(keys
-			.map(async (key): Promise<{readonly key: string; readonly value: T}> => {
+		const resultEntries = await Promise.all(keys.map(
+			async (key): Promise<{readonly key: string; readonly value: T}> => {
 				const value = await this.#store.get(key)
 				return {key, value: value!}
-			}),
-		)
+			},
+		))
 
 		return arrayToRecord(resultEntries)
 	}
