@@ -1,4 +1,4 @@
-import type {MaybePromise} from '../types.js'
+import type {MaybePromise} from '../types.js';
 
 // Do not export this.
 // Either the user wants to use a specific implementation or define the minimal required Store themselves.
@@ -37,11 +37,11 @@ export type Store<T> = {
 	 * Remove all entries
 	 */
 	readonly clear: () => MaybePromise<void>;
-}
+};
 
 export type ExtendedStore<T> = Store<T> & {
 	/**
 	 * Return all currently set keys
 	 */
 	readonly keys: () => MaybePromise<readonly string[]>;
-}
+};

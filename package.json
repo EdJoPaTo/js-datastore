@@ -41,7 +41,6 @@
 		"access": "public"
 	},
 	"xo": {
-		"semicolon": false,
 		"rules": {
 			"@typescript-eslint/prefer-readonly-parameter-types": "error"
 		}
