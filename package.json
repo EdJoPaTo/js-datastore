@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"json-stable-stringify": "^1.0.1",
-		"write-file-atomic": "^4.0.0"
+		"write-file-atomic": "^5.0.0"
 	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^3.0.0",
