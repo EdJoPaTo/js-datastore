@@ -23,7 +23,7 @@ export class TtlKeyValueInMemoryFile<K extends string, V> implements ExtendedSto
 			}
 		}
 
-		if (cleanupIntervalMilliseconds && Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
+		if (Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
 			setInterval(async () => this.#cleanupOld(), cleanupIntervalMilliseconds);
 		}
 	}

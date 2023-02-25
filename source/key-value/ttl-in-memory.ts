@@ -12,7 +12,7 @@ export class TtlKeyValueInMemory<K extends string, V> implements ExtendedStore<K
 	constructor(
 		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
 	) {
-		if (cleanupIntervalMilliseconds && Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
+		if (Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
 			setInterval(async () => this.#cleanupOld(), cleanupIntervalMilliseconds);
 		}
 	}

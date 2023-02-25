@@ -28,7 +28,7 @@ export class TtlKeyValueInMemoryFiles<K extends string, V> implements ExtendedSt
 			this.#inMemoryStorage.set(entry, this.#getFromFilesystem(entry));
 		}
 
-		if (cleanupIntervalMilliseconds && Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
+		if (Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
 			setInterval(async () => this.#cleanupOld(), cleanupIntervalMilliseconds);
 		}
 	}
