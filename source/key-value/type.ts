@@ -12,13 +12,13 @@ import type {MaybePromise} from '../types.js';
 /**
  * Keyv compatible Store. See https://github.com/lukechilds/keyv
  */
-export type Store<T> = {
+export type Store<K extends string, V> = {
 	readonly ttlSupport: boolean;
 
 	/**
 	 * Get the current value of a key. Is undefined when the value is currently not set.
 	 */
-	readonly get: (key: string) => MaybePromise<T | undefined>;
+	readonly get: (key: K) => MaybePromise<V | undefined>;
 
 	/**
 	 * Set a key to a specific value.
@@ -26,12 +26,12 @@ export type Store<T> = {
 	 * @param value value to set to the key
 	 * @param ttl time to live of the object in milliseconds from now (when supported by the implementation)
 	 */
-	readonly set: (key: string, value: T, ttl?: number) => MaybePromise<void>;
+	readonly set: (key: K, value: V, ttl?: number) => MaybePromise<void>;
 
 	/**
 	 * Delete a key from the store. Returns true when the key existed, false if the element does not exist.
 	 */
-	readonly delete: (key: string) => MaybePromise<boolean>;
+	readonly delete: (key: K) => MaybePromise<boolean>;
 
 	/**
 	 * Remove all entries
@@ -39,9 +39,9 @@ export type Store<T> = {
 	readonly clear: () => MaybePromise<void>;
 };
 
-export type ExtendedStore<T> = Store<T> & {
+export type ExtendedStore<K extends string, V> = Store<K, V> & {
 	/**
 	 * Return all currently set keys
 	 */
-	readonly keys: () => MaybePromise<readonly string[]>;
+	readonly keys: () => MaybePromise<readonly K[]>;
 };

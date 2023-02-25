@@ -19,12 +19,12 @@ export function createEntry<T>(
 	return {value, until};
 }
 
-export async function cleanupOld<T>(
-	map: Readonly<ReadonlyMap<string, Entry<T>>>,
-	deleteFunction: (key: string) => MaybePromise<boolean>,
+export async function cleanupOld<K extends string, V>(
+	map: Readonly<ReadonlyMap<K, Entry<V>>>,
+	deleteFunction: (key: K) => MaybePromise<boolean>,
 	now = Date.now(),
 ): Promise<void> {
-	const toBeDeleted: string[] = [];
+	const toBeDeleted: K[] = [];
 
 	for (const [key, value] of map.entries()) {
 		if (typeof value.until === 'number' && value.until < now) {

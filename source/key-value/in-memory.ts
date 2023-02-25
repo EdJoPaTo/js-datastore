@@ -1,25 +1,25 @@
 import type {ExtendedStore} from './type.js';
 
-export class KeyValueInMemory<T> implements ExtendedStore<T> {
+export class KeyValueInMemory<K extends string, V> implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return false;
 	}
 
-	readonly #inMemoryStorage = new Map<string, T>();
+	readonly #inMemoryStorage = new Map<K, V>();
 
-	keys(): readonly string[] {
+	keys(): readonly K[] {
 		return [...this.#inMemoryStorage.keys()];
 	}
 
-	get(key: string): T | undefined {
+	get(key: K): V | undefined {
 		return this.#inMemoryStorage.get(key);
 	}
 
-	set(key: string, value: T): void {
+	set(key: K, value: V): void {
 		this.#inMemoryStorage.set(key, value);
 	}
 
-	delete(key: string): boolean {
+	delete(key: K): boolean {
 		return this.#inMemoryStorage.delete(key);
 	}
 

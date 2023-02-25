@@ -2,12 +2,12 @@ import {cleanupOld, createEntry} from './time-to-live.js';
 import type {Entry} from './time-to-live.js';
 import type {ExtendedStore} from './type.js';
 
-export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
+export class TtlKeyValueInMemory<K extends string, V> implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return true;
 	}
 
-	readonly #inMemoryStorage = new Map<string, Entry<T>>();
+	readonly #inMemoryStorage = new Map<K, Entry<V>>();
 
 	constructor(
 		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
@@ -17,11 +17,11 @@ export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
 		}
 	}
 
-	keys(): readonly string[] {
+	keys(): readonly K[] {
 		return [...this.#inMemoryStorage.keys()];
 	}
 
-	get(key: string): T | undefined {
+	get(key: K): V | undefined {
 		const now = Date.now();
 		const entry = this.#inMemoryStorage.get(key);
 		if (entry?.until && entry.until > now) {
@@ -31,11 +31,11 @@ export class TtlKeyValueInMemory<T> implements ExtendedStore<T> {
 		return undefined;
 	}
 
-	set(key: string, value: T, ttl?: number): void {
+	set(key: K, value: V, ttl?: number): void {
 		this.#inMemoryStorage.set(key, createEntry(value, ttl));
 	}
 
-	delete(key: string): boolean {
+	delete(key: K): boolean {
 		return this.#inMemoryStorage.delete(key);
 	}
 

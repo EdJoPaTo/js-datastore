@@ -8,12 +8,12 @@ import {
 import {writeJsonFile} from '../write.js';
 import type {ExtendedStore} from './type.js';
 
-export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
+export class KeyValueInMemoryFiles<K extends string, V> implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return false;
 	}
 
-	readonly #inMemoryStorage = new Map<string, T>();
+	readonly #inMemoryStorage = new Map<K, V>();
 
 	constructor(
 		private readonly directory: string,
@@ -26,20 +26,20 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		}
 	}
 
-	keys(): readonly string[] {
+	keys(): readonly K[] {
 		return [...this.#inMemoryStorage.keys()];
 	}
 
-	get(key: string): T | undefined {
+	get(key: K): V | undefined {
 		return this.#inMemoryStorage.get(key);
 	}
 
-	async set(key: string, value: T): Promise<void> {
+	async set(key: K, value: V): Promise<void> {
 		this.#inMemoryStorage.set(key, value);
 		await writeJsonFile(this.#pathOfKey(key), value);
 	}
 
-	delete(key: string): boolean {
+	delete(key: K): boolean {
 		const result = this.#inMemoryStorage.delete(key);
 		if (existsSync(this.#pathOfKey(key))) {
 			unlinkSync(this.#pathOfKey(key));
@@ -54,18 +54,17 @@ export class KeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		}
 	}
 
-	#pathOfKey(key: string): string {
+	#pathOfKey(key: K): string {
 		return `${this.directory}/${key}.json`;
 	}
 
-	#listFromFilesystem(): readonly string[] {
+	#listFromFilesystem(): readonly K[] {
 		return readdirSync(this.directory)
-			.map(o => o.replace('.json', ''));
+			.map(o => o.replace('.json', '') as K);
 	}
 
-	#getFromFilesystem(key: string): T {
+	#getFromFilesystem(key: K): V {
 		const content = readFileSync(this.#pathOfKey(key), 'utf8');
-		const json = JSON.parse(content) as T;
-		return json;
+		return JSON.parse(content) as V;
 	}
 }

@@ -4,12 +4,12 @@ import {cleanupOld, createEntry} from './time-to-live.js';
 import type {Entry} from './time-to-live.js';
 import type {ExtendedStore} from './type.js';
 
-export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
+export class TtlKeyValueInMemoryFile<K extends string, V> implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return true;
 	}
 
-	readonly #inMemoryStorage = new Map<string, Entry<T>>();
+	readonly #inMemoryStorage = new Map<K, Entry<V>>();
 
 	constructor(
 		private readonly filepath: string,
@@ -17,9 +17,9 @@ export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 	) {
 		if (existsSync(this.filepath)) {
 			const raw = readFileSync(this.filepath, 'utf8');
-			const json = JSON.parse(raw) as Array<Entry<T>>;
+			const json = JSON.parse(raw) as Array<Entry<V>>;
 			for (const [key, value] of Object.entries(json)) {
-				this.#inMemoryStorage.set(key, value);
+				this.#inMemoryStorage.set(key as K, value);
 			}
 		}
 
@@ -28,11 +28,11 @@ export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 		}
 	}
 
-	keys(): readonly string[] {
+	keys(): readonly K[] {
 		return [...this.#inMemoryStorage.keys()];
 	}
 
-	get(key: string): T | undefined {
+	get(key: K): V | undefined {
 		const now = Date.now();
 		const entry = this.#inMemoryStorage.get(key);
 		if (entry?.until && entry.until > now) {
@@ -42,12 +42,12 @@ export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 		return undefined;
 	}
 
-	async set(key: string, value: T, ttl?: number): Promise<void> {
+	async set(key: K, value: V, ttl?: number): Promise<void> {
 		this.#inMemoryStorage.set(key, createEntry(value, ttl));
 		await writeJsonFile(this.filepath, this.#createFileContent());
 	}
 
-	async delete(key: string): Promise<boolean> {
+	async delete(key: K): Promise<boolean> {
 		const result = this.#inMemoryStorage.delete(key);
 		if (this.#inMemoryStorage.size > 0) {
 			await writeJsonFile(this.filepath, this.#createFileContent());
@@ -70,11 +70,6 @@ export class TtlKeyValueInMemoryFile<T> implements ExtendedStore<T> {
 	}
 
 	#createFileContent(): Record<string, unknown> {
-		const json: Record<string, unknown> = {};
-		for (const [key, value] of this.#inMemoryStorage.entries()) {
-			json[key] = value;
-		}
-
-		return json;
+		return Object.fromEntries(this.#inMemoryStorage.entries());
 	}
 }

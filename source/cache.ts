@@ -1,67 +1,58 @@
-import {arrayToRecord} from './transform.js';
 import {KeyValueInMemory} from './key-value/index.js';
 import type {MaybePromise} from './types.js';
 
-export type QueryOneFunction<T> = (key: string) => MaybePromise<T>;
-export type QueryBulkFunction<T> = (
-	keys: readonly string[],
-) => MaybePromise<Record<string, T>>;
+export type QueryOneFunction<K extends string, V> = (key: K) => MaybePromise<V>;
+export type QueryBulkFunction<K extends string, V> = (
+	keys: readonly K[],
+) => MaybePromise<Record<K, V>>;
 
-type QueryOneArgument<T> = {
-	readonly singleQuery: QueryOneFunction<T>;
-	readonly bulkQuery?: QueryBulkFunction<T>;
+type QueryOneArgument<K extends string, V> = {
+	readonly singleQuery: QueryOneFunction<K, V>;
+	readonly bulkQuery?: QueryBulkFunction<K, V>;
 };
 
-type QueryBulkArgument<T> = {
-	readonly singleQuery?: QueryOneFunction<T>;
-	readonly bulkQuery: QueryBulkFunction<T>;
+type QueryBulkArgument<K extends string, V> = {
+	readonly singleQuery?: QueryOneFunction<K, V>;
+	readonly bulkQuery: QueryBulkFunction<K, V>;
 };
 
-type QueryArgument<T> = QueryOneArgument<T> | QueryBulkArgument<T>;
+type QueryArgument<K extends string, V> =
+	| QueryOneArgument<K, V>
+	| QueryBulkArgument<K, V>;
 
-type Store<T> = {
-	readonly get: (key: string) => MaybePromise<T | undefined>;
-	readonly set: (key: string, value: T, ttl?: number) => MaybePromise<unknown>;
+type Store<K extends string, V> = {
+	readonly get: (key: K) => MaybePromise<V | undefined>;
+	readonly set: (key: K, value: V, ttl?: number) => MaybePromise<unknown>;
 };
 
-export type Options<T> = {
-	readonly store?: Store<T>;
+export type Options<K extends string, V> = {
+	readonly store?: Store<K, V>;
 	readonly ttl?: number;
 };
 
-function generateFallbackBulk<T>(
-	singleQuery: QueryOneFunction<T>,
-): QueryBulkFunction<T> {
+function generateFallbackBulk<K extends string, V>(
+	singleQuery: QueryOneFunction<K, V>,
+): QueryBulkFunction<K, V> {
 	return async keys => {
-		const entries = await Promise.all(keys
-			.map(
-				async (key): Promise<{readonly key: string; readonly value: T}> => {
-					const value = await singleQuery(key);
-					return {key, value};
-				},
-			));
-
-		const result: Record<string, T> = {};
-		for (const {key, value} of entries) {
-			result[key] = value;
-		}
-
-		return result;
+		const entries = await Promise.all(
+			keys.map(async (key): Promise<[K, V]> => [key, await singleQuery(key)]),
+		);
+		return Object.fromEntries(entries) as Record<K, V>;
 	};
 }
 
-export class Cache<T> {
-	readonly #store: Store<T>;
+export class Cache<K extends string, V> {
+	readonly #store: Store<K, V>;
 
 	readonly #ttl: number | undefined;
 
-	readonly #singleQuery: QueryOneFunction<T>;
+	readonly #singleQuery: QueryOneFunction<K, V>;
 
-	readonly #bulkQuery: QueryBulkFunction<T>;
+	readonly #bulkQuery: QueryBulkFunction<K, V>;
 
 	constructor(
-		readonly query: QueryArgument<T>,
-		options: Options<T> = {},
+		readonly query: QueryArgument<K, V>,
+		options: Options<K, V> = {},
 	) {
 		this.#store = options.store ?? new KeyValueInMemory();
 		this.#ttl = options.ttl;
@@ -74,7 +65,7 @@ export class Cache<T> {
 		this.#bulkQuery = query.bulkQuery ?? generateFallbackBulk(query.singleQuery!);
 	}
 
-	async get(key: string, forceQuery = false): Promise<T> {
+	async get(key: K, forceQuery = false): Promise<V> {
 		if (!forceQuery) {
 			const value = await this.#store.get(key);
 			if (value) {
@@ -88,37 +79,37 @@ export class Cache<T> {
 	}
 
 	async getMany(
-		keys: readonly string[],
+		keys: readonly K[],
 		force = false,
-	): Promise<Record<string, T>> {
-		let keysToBeLoaded: readonly string[];
+	): Promise<Record<K, V>> {
+		let keysToBeLoaded: readonly K[];
 		if (force) {
 			keysToBeLoaded = keys;
 		} else {
 			const missingKeys = await Promise.all(keys
-				.map(async key => {
+				.map(async (key): Promise<string | undefined> => {
 					const missing = (await this.#store.get(key)) === undefined;
 					return missing ? key : undefined;
 				}));
 			keysToBeLoaded = missingKeys
-				.filter((o): o is string => typeof o === 'string');
+				.filter((o): o is K => typeof o === 'string');
 		}
 
 		if (keysToBeLoaded.length > 0) {
 			const queryResults = await this.#bulkQuery(keysToBeLoaded);
-			await Promise.all(Object.entries(queryResults)
+			await Promise.all((Object.entries<V>(queryResults))
 				// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-				.map(async ([key, value]) => this.#store.set(key, value, this.#ttl)),
+				.map(async ([key, value]) => this.#store.set(key as K, value, this.#ttl)),
 			);
 		}
 
 		const resultEntries = await Promise.all(keys.map(
-			async (key): Promise<{readonly key: string; readonly value: T}> => {
+			async (key): Promise<[K, V]> => {
 				const value = await this.#store.get(key);
-				return {key, value: value!};
+				return [key, value!];
 			},
 		));
 
-		return arrayToRecord(resultEntries);
+		return Object.fromEntries(resultEntries) as Record<K, V>;
 	}
 }

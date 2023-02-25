@@ -10,12 +10,12 @@ import {cleanupOld, createEntry} from './time-to-live.js';
 import type {Entry} from './time-to-live.js';
 import type {ExtendedStore} from './type.js';
 
-export class TtlKeyValueInMemoryFiles<T> implements ExtendedStore<T> {
+export class TtlKeyValueInMemoryFiles<K extends string, V> implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return true;
 	}
 
-	readonly #inMemoryStorage = new Map<string, Entry<T>>();
+	readonly #inMemoryStorage = new Map<K, Entry<V>>();
 
 	constructor(
 		private readonly directory: string,
@@ -33,11 +33,11 @@ export class TtlKeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		}
 	}
 
-	keys(): readonly string[] {
+	keys(): readonly K[] {
 		return [...this.#inMemoryStorage.keys()];
 	}
 
-	get(key: string): T | undefined {
+	get(key: K): V | undefined {
 		const now = Date.now();
 		const entry = this.#inMemoryStorage.get(key);
 		if (entry?.until && entry.until > now) {
@@ -47,13 +47,13 @@ export class TtlKeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		return undefined;
 	}
 
-	async set(key: string, value: T, ttl?: number): Promise<void> {
+	async set(key: K, value: V, ttl?: number): Promise<void> {
 		const entry = createEntry(value, ttl);
 		this.#inMemoryStorage.set(key, entry);
 		await writeJsonFile(this.#pathOfKey(key), entry);
 	}
 
-	delete(key: string): boolean {
+	delete(key: K): boolean {
 		const result = this.#inMemoryStorage.delete(key);
 		if (existsSync(this.#pathOfKey(key))) {
 			unlinkSync(this.#pathOfKey(key));
@@ -68,18 +68,18 @@ export class TtlKeyValueInMemoryFiles<T> implements ExtendedStore<T> {
 		}
 	}
 
-	#pathOfKey(key: string): string {
+	#pathOfKey(key: K): string {
 		return `${this.directory}/${key}.json`;
 	}
 
-	#listFromFilesystem(): readonly string[] {
+	#listFromFilesystem(): readonly K[] {
 		return readdirSync(this.directory)
-			.map(o => o.replace('.json', ''));
+			.map(o => o.replace('.json', '') as K);
 	}
 
-	#getFromFilesystem(key: string): Entry<T> {
+	#getFromFilesystem(key: K): Entry<V> {
 		const content = readFileSync(this.#pathOfKey(key), 'utf8');
-		const json = JSON.parse(content) as Entry<T>;
+		const json = JSON.parse(content) as Entry<V>;
 		return json;
 	}
 
