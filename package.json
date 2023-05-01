@@ -3,7 +3,10 @@
 	"version": "0.6.0",
 	"description": "Handles different ways to store data within NodeJS",
 	"license": "MIT",
-	"repository": "EdJoPaTo/js-datastore",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/EdJoPaTo/js-datastore.git"
+	},
 	"author": {
 		"name": "EdJoPaTo",
 		"email": "js-datastore-npm-package@edjopato.de",
