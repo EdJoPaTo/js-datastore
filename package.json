@@ -1,7 +1,7 @@
 {
 	"name": "@edjopato/datastore",
 	"version": "0.6.0",
-	"description": "Handles different ways to store data within NodeJS",
+	"description": "Handles different ways to store data within Node.js",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
