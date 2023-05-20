@@ -17,7 +17,7 @@
 		"prepack": "npm run build",
 		"test": "tsc --sourceMap && xo"
 	},
-	"type": "commonjs",
+	"type": "module",
 	"engines": {
 		"node": ">=18"
 	},
