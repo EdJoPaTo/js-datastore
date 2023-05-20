@@ -4,6 +4,7 @@
 		"source"
 	],
 	"compilerOptions": {
+		"target": "ES2022", // Node.js 18
 		"sourceMap": true,
 		"module": "CommonJS",
 		"outDir": "dist"
