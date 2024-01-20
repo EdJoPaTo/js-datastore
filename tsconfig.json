@@ -4,6 +4,7 @@
 		"source"
 	],
 	"compilerOptions": {
+		"lib": ["ES2022"],
 		"target": "ES2022", // Node.js 18
 		"sourceMap": true,
 		"outDir": "dist"
