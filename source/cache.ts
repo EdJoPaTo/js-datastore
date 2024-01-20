@@ -59,7 +59,7 @@ export class Cache<K extends string, V> {
 
 		this.#singleQuery = query.singleQuery ?? (async key => {
 			const result = await query.bulkQuery!([key]);
-			return result[key]!;
+			return result[key];
 		});
 
 		this.#bulkQuery = query.bulkQuery ?? generateFallbackBulk(query.singleQuery!);
