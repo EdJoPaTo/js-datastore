@@ -28,7 +28,7 @@
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^5.0.0",
 		"@types/json-stable-stringify": "^1.0.33",
-		"@types/node": "^18.16.13",
+		"@types/node": "^20.14.7",
 		"@types/write-file-atomic": "^4.0.0",
 		"del-cli": "^5.0.0",
 		"typescript": "^5.0.2",
