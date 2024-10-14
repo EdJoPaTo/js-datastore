@@ -30,7 +30,7 @@
 		"@types/json-stable-stringify": "^1.0.33",
 		"@types/node": "^18.16.13",
 		"@types/write-file-atomic": "^4.0.0",
-		"del-cli": "^5.0.0",
+		"del-cli": "^6.0.0",
 		"typescript": "^5.5.2",
 		"xo": "^0.59.3"
 	},
