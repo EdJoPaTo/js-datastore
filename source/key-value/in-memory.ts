@@ -1,4 +1,4 @@
-import type {ExtendedStore} from './type.js';
+import type {ExtendedStore} from './type.ts';
 
 export class KeyValueInMemory<K extends string, V>
 implements ExtendedStore<K, V> {

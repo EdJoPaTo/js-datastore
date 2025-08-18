@@ -1,5 +1,5 @@
-import {KeyValueInMemory} from './key-value/index.js';
-import type {MaybePromise} from './types.js';
+import {KeyValueInMemory} from './key-value/index.ts';
+import type {MaybePromise} from './types.ts';
 
 export type QueryOneFunction<K extends string, V> = (key: K) => MaybePromise<V>;
 export type QueryBulkFunction<K extends string, V> = (

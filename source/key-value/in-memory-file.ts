@@ -1,6 +1,6 @@
 import {existsSync, readFileSync, unlinkSync} from 'node:fs';
-import {writeJsonFile} from '../write.js';
-import type {ExtendedStore} from './type.js';
+import {writeJsonFile} from '../write.ts';
+import type {ExtendedStore} from './type.ts';
 
 export class KeyValueInMemoryFile<K extends string, V>
 implements ExtendedStore<K, V> {
