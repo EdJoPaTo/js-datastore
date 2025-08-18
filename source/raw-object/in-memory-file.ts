@@ -5,9 +5,7 @@ import type {RawObjectStorage} from './type.js';
 export class RawObjectInMemoryFile<T> implements RawObjectStorage<T> {
 	#content: T | undefined;
 
-	constructor(
-		private readonly filepath: string,
-	) {
+	constructor(private readonly filepath: string) {
 		if (existsSync(this.filepath)) {
 			const raw = readFileSync(this.filepath, 'utf8');
 			const json = JSON.parse(raw) as T;

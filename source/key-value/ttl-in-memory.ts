@@ -1,17 +1,19 @@
 import {cleanupOld, createEntry, type Entry} from './time-to-live.js';
 import type {ExtendedStore} from './type.js';
 
-export class TtlKeyValueInMemory<K extends string, V> implements ExtendedStore<K, V> {
+export class TtlKeyValueInMemory<K extends string, V>
+implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return true;
 	}
 
 	readonly #inMemoryStorage = new Map<K, Entry<V>>();
 
-	constructor(
-		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
-	) {
-		if (Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
+	constructor(cleanupIntervalMilliseconds: number = 5 * 60 * 1000) {
+		if (
+			Number.isFinite(cleanupIntervalMilliseconds)
+			&& cleanupIntervalMilliseconds > 0
+		) {
 			setInterval(async () => this.#cleanupOld(), cleanupIntervalMilliseconds);
 		}
 	}

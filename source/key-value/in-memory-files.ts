@@ -8,16 +8,15 @@ import {
 import {writeJsonFile} from '../write.js';
 import type {ExtendedStore} from './type.js';
 
-export class KeyValueInMemoryFiles<K extends string, V> implements ExtendedStore<K, V> {
+export class KeyValueInMemoryFiles<K extends string, V>
+implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return false;
 	}
 
 	readonly #inMemoryStorage = new Map<K, V>();
 
-	constructor(
-		private readonly directory: string,
-	) {
+	constructor(private readonly directory: string) {
 		mkdirSync(directory, {recursive: true});
 
 		const entries = this.#listFromFilesystem();
@@ -59,8 +58,7 @@ export class KeyValueInMemoryFiles<K extends string, V> implements ExtendedStore
 	}
 
 	#listFromFilesystem(): readonly K[] {
-		return readdirSync(this.directory)
-			.map(o => o.replace('.json', '') as K);
+		return readdirSync(this.directory).map(o => o.replace('.json', '') as K);
 	}
 
 	#getFromFilesystem(key: K): V {

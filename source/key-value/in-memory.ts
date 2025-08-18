@@ -1,6 +1,7 @@
 import type {ExtendedStore} from './type.js';
 
-export class KeyValueInMemory<K extends string, V> implements ExtendedStore<K, V> {
+export class KeyValueInMemory<K extends string, V>
+implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return false;
 	}

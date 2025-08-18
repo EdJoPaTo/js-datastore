@@ -2,16 +2,15 @@ import {existsSync, readFileSync, unlinkSync} from 'node:fs';
 import {writeJsonFile} from '../write.js';
 import type {ExtendedStore} from './type.js';
 
-export class KeyValueInMemoryFile<K extends string, V> implements ExtendedStore<K, V> {
+export class KeyValueInMemoryFile<K extends string, V>
+implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return false;
 	}
 
 	readonly #inMemoryStorage = new Map<K, V>();
 
-	constructor(
-		private readonly filepath: string,
-	) {
+	constructor(private readonly filepath: string) {
 		if (existsSync(this.filepath)) {
 			const raw = readFileSync(this.filepath, 'utf8');
 			const json = JSON.parse(raw) as V[];

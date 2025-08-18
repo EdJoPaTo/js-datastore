@@ -3,7 +3,8 @@ import {writeJsonFile} from '../write.js';
 import {cleanupOld, createEntry, type Entry} from './time-to-live.js';
 import type {ExtendedStore} from './type.js';
 
-export class TtlKeyValueInMemoryFile<K extends string, V> implements ExtendedStore<K, V> {
+export class TtlKeyValueInMemoryFile<K extends string, V>
+implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return true;
 	}
@@ -22,7 +23,10 @@ export class TtlKeyValueInMemoryFile<K extends string, V> implements ExtendedSto
 			}
 		}
 
-		if (Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
+		if (
+			Number.isFinite(cleanupIntervalMilliseconds)
+			&& cleanupIntervalMilliseconds > 0
+		) {
 			setInterval(async () => this.#cleanupOld(), cleanupIntervalMilliseconds);
 		}
 	}

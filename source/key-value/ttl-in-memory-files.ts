@@ -9,7 +9,8 @@ import {writeJsonFile} from '../write.js';
 import {cleanupOld, createEntry, type Entry} from './time-to-live.js';
 import type {ExtendedStore} from './type.js';
 
-export class TtlKeyValueInMemoryFiles<K extends string, V> implements ExtendedStore<K, V> {
+export class TtlKeyValueInMemoryFiles<K extends string, V>
+implements ExtendedStore<K, V> {
 	get ttlSupport() {
 		return true;
 	}
@@ -27,7 +28,10 @@ export class TtlKeyValueInMemoryFiles<K extends string, V> implements ExtendedSt
 			this.#inMemoryStorage.set(entry, this.#getFromFilesystem(entry));
 		}
 
-		if (Number.isFinite(cleanupIntervalMilliseconds) && cleanupIntervalMilliseconds > 0) {
+		if (
+			Number.isFinite(cleanupIntervalMilliseconds)
+			&& cleanupIntervalMilliseconds > 0
+		) {
 			setInterval(async () => this.#cleanupOld(), cleanupIntervalMilliseconds);
 		}
 	}
@@ -72,8 +76,7 @@ export class TtlKeyValueInMemoryFiles<K extends string, V> implements ExtendedSt
 	}
 
 	#listFromFilesystem(): readonly K[] {
-		return readdirSync(this.directory)
-			.map(o => o.replace('.json', '') as K);
+		return readdirSync(this.directory).map(o => o.replace('.json', '') as K);
 	}
 
 	#getFromFilesystem(key: K): Entry<V> {
