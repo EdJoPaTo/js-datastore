@@ -14,10 +14,13 @@ implements ExtendedStore<K, V> {
 		return false;
 	}
 
+	readonly #directory: string;
+
 	readonly #inMemoryStorage = new Map<K, V>();
 
-	constructor(private readonly directory: string) {
+	constructor(directory: string) {
 		mkdirSync(directory, {recursive: true});
+		this.#directory = directory;
 
 		const entries = this.#listFromFilesystem();
 		for (const entry of entries) {
@@ -54,11 +57,11 @@ implements ExtendedStore<K, V> {
 	}
 
 	#pathOfKey(key: K): string {
-		return `${this.directory}/${key}.json`;
+		return `${this.#directory}/${key}.json`;
 	}
 
 	#listFromFilesystem(): readonly K[] {
-		return readdirSync(this.directory).map(o => o.replace('.json', '') as K);
+		return readdirSync(this.#directory).map(o => o.replace('.json', '') as K);
 	}
 
 	#getFromFilesystem(key: K): V {

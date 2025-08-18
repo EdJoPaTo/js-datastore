@@ -46,10 +46,7 @@ export class Cache<K extends string, V> {
 
 	readonly #bulkQuery: QueryBulkFunction<K, V>;
 
-	constructor(
-		readonly query: QueryArgument<K, V>,
-		options: Options<K, V> = {},
-	) {
+	constructor(query: QueryArgument<K, V>, options: Options<K, V> = {}) {
 		this.#store = options.store ?? new KeyValueInMemory();
 		this.#ttl = options.ttl;
 

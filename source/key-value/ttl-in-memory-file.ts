@@ -9,14 +9,17 @@ implements ExtendedStore<K, V> {
 		return true;
 	}
 
+	readonly #filepath: string;
+
 	readonly #inMemoryStorage = new Map<K, Entry<V>>();
 
 	constructor(
-		private readonly filepath: string,
+		filepath: string,
 		cleanupIntervalMilliseconds: number = 5 * 60 * 1000,
 	) {
-		if (existsSync(this.filepath)) {
-			const raw = readFileSync(this.filepath, 'utf8');
+		this.#filepath = filepath;
+		if (existsSync(filepath)) {
+			const raw = readFileSync(filepath, 'utf8');
 			const json = JSON.parse(raw) as Array<Entry<V>>;
 			for (const [key, value] of Object.entries(json)) {
 				this.#inMemoryStorage.set(key as K, value);
@@ -47,15 +50,15 @@ implements ExtendedStore<K, V> {
 
 	async set(key: K, value: V, ttl?: number): Promise<void> {
 		this.#inMemoryStorage.set(key, createEntry(value, ttl));
-		await writeJsonFile(this.filepath, this.#createFileContent());
+		await writeJsonFile(this.#filepath, this.#createFileContent());
 	}
 
 	async delete(key: K): Promise<boolean> {
 		const result = this.#inMemoryStorage.delete(key);
 		if (this.#inMemoryStorage.size > 0) {
-			await writeJsonFile(this.filepath, this.#createFileContent());
-		} else if (existsSync(this.filepath)) {
-			unlinkSync(this.filepath);
+			await writeJsonFile(this.#filepath, this.#createFileContent());
+		} else if (existsSync(this.#filepath)) {
+			unlinkSync(this.#filepath);
 		}
 
 		return result;
@@ -63,8 +66,8 @@ implements ExtendedStore<K, V> {
 
 	clear(): void {
 		this.#inMemoryStorage.clear();
-		if (existsSync(this.filepath)) {
-			unlinkSync(this.filepath);
+		if (existsSync(this.#filepath)) {
+			unlinkSync(this.#filepath);
 		}
 	}
 
