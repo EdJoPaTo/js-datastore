@@ -13,7 +13,7 @@
 		"url": "https://edjopato.de"
 	},
 	"scripts": {
-		"build": "del-cli dist && tsc",
+		"build": "rm -rf ./dist && tsc",
 		"prepack": "npm run build",
 		"test": "tsc --sourceMap && xo"
 	},
@@ -28,7 +28,6 @@
 	"devDependencies": {
 		"@types/node": "^18.16.13",
 		"@types/write-file-atomic": "^4.0.0",
-		"del-cli": "^6.0.0",
 		"typescript": "^5.9.2",
 		"xo": "^1.2.2"
 	},
