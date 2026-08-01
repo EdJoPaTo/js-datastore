@@ -9,39 +9,29 @@ import type {MaybePromise} from '../types.ts';
 // See Keyv current Store<T> typing: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/keyv/index.d.ts#L62
 // make sure to accept unknown as a set return type as JS Map returns this for example which differs from other implementations
 
-/**
- * Keyv compatible Store. See https://github.com/lukechilds/keyv
- */
+/** Keyv compatible Store. See https://github.com/lukechilds/keyv */
 export type Store<K extends string, V> = {
 	readonly ttlSupport: boolean;
 
-	/**
-	 * Get the current value of a key. Is undefined when the value is currently not set.
-	 */
+	/** Get the current value of a key. Is undefined when the value is currently not set. */
 	readonly get: (key: K) => MaybePromise<V | undefined>;
 
 	/**
-	 * Set a key to a specific value.
-	 * @param key key to be set
-	 * @param value value to set to the key
-	 * @param ttl time to live of the object in milliseconds from now (when supported by the implementation)
-	 */
+	Set a key to a specific value.
+	@param key key to be set
+	@param value value to set to the key
+	@param ttl time to live of the object in milliseconds from now (when supported by the implementation)
+	*/
 	readonly set: (key: K, value: V, ttl?: number) => MaybePromise<void>;
 
-	/**
-	 * Delete a key from the store. Returns true when the key existed, false if the element does not exist.
-	 */
+	/** Delete a key from the store. Returns true when the key existed, false if the element does not exist. */
 	readonly delete: (key: K) => MaybePromise<boolean>;
 
-	/**
-	 * Remove all entries
-	 */
+	/** Remove all entries */
 	readonly clear: () => MaybePromise<void>;
 };
 
 export type ExtendedStore<K extends string, V> = Store<K, V> & {
-	/**
-	 * Return all currently set keys
-	 */
+	/** Return all currently set keys */
 	readonly keys: () => MaybePromise<readonly K[]>;
 };
