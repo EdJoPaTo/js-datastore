@@ -54,14 +54,14 @@ implements ExtendedStore<K, V> {
 	}
 
 	async delete(key: K): Promise<boolean> {
-		const result = this.#inMemoryStorage.delete(key);
+		const wasRemoved = this.#inMemoryStorage.delete(key);
 		if (this.#inMemoryStorage.size > 0) {
 			await writeJsonFile(this.#filepath, this.#createFileContent());
 		} else if (existsSync(this.#filepath)) {
 			unlinkSync(this.#filepath);
 		}
 
-		return result;
+		return wasRemoved;
 	}
 
 	clear(): void {

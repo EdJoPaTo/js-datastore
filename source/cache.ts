@@ -79,8 +79,8 @@ export class Cache<K extends string, V> {
 			keysToBeLoaded = keys;
 		} else {
 			const missingKeys = await Promise.all(keys.map(async (key): Promise<string | undefined> => {
-				const missing = (await this.#store.get(key)) === undefined;
-				return missing ? key : undefined;
+				const isMissing = (await this.#store.get(key)) === undefined;
+				return isMissing ? key : undefined;
 			}));
 			keysToBeLoaded = missingKeys.filter((o): o is K => typeof o === 'string');
 		}

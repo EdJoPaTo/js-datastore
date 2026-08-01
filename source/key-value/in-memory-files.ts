@@ -42,12 +42,12 @@ implements ExtendedStore<K, V> {
 	}
 
 	delete(key: K): boolean {
-		const result = this.#inMemoryStorage.delete(key);
+		const wasRemoved = this.#inMemoryStorage.delete(key);
 		if (existsSync(this.#pathOfKey(key))) {
 			unlinkSync(this.#pathOfKey(key));
 		}
 
-		return result;
+		return wasRemoved;
 	}
 
 	clear(): void {
