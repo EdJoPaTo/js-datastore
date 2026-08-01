@@ -55,6 +55,6 @@ implements ExtendedStore<K, V> {
 	}
 
 	#createFileContent(): Record<string, unknown> {
-		return Object.fromEntries(this.#inMemoryStorage.entries());
+		return Object.fromEntries(this.#inMemoryStorage);
 	}
 }
