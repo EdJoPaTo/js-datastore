@@ -23,7 +23,7 @@
 	},
 	"dependencies": {
 		"json-stable-stringify": "^1.2.1",
-		"write-file-atomic": "^6.0.0"
+		"write-file-atomic": "^8.0.0"
 	},
 	"devDependencies": {
 		"@types/node": "^22.20.1",
