@@ -16,7 +16,7 @@ export type Options<K extends string, V> = {
 	readonly ttl?: number;
 };
 
-export function cacheBulkQueryFromSingle<K extends string, V>(singleQuery: (key: K) => MaybePromise<V>): Query<K, V> {
+export function cacheQueryFromSingle<K extends string, V>(singleQuery: (key: K) => MaybePromise<V>): Query<K, V> {
 	return async keys => {
 		const entries = await Promise.all(keys.map(async (key): Promise<[K, V]> => [key, await singleQuery(key)]));
 		return Object.fromEntries(entries) as Record<K, V>;
@@ -51,28 +51,25 @@ export class Cache<K extends string, V> {
 	}
 
 	async getMany(keys: readonly K[], force = false): Promise<Record<K, V>> {
-		let keysToBeLoaded: readonly K[];
-		if (force) {
-			keysToBeLoaded = keys;
-		} else {
-			const missingKeys = await Promise.all(keys.map(async (key): Promise<string | undefined> => {
-				const isMissing = (await this.#store.get(key)) === undefined;
-				return isMissing ? key : undefined;
-			}));
-			keysToBeLoaded = missingKeys.filter((o): o is K => typeof o === 'string');
+		const result: Partial<Record<K, V>> = {};
+		if (!force) {
+			const current = await Promise.all(keys.map(async key => [key, await this.#store.get(key)] as const));
+			for (const [key, value] of current) {
+				if (value) {
+					result[key] = value;
+				}
+			}
 		}
 
+		const resultKeySet = new Set(Object.keys(result));
+		const keysToBeLoaded = keys.filter(key => !resultKeySet.has(key));
 		if (keysToBeLoaded.length > 0) {
 			const queryResults = await this.#query(keysToBeLoaded);
 			await Promise.all(Object.entries<V>(queryResults).map(async ([key, value]) =>
 				this.#store.set(key as K, value, this.#ttl)));
+			Object.assign(result, queryResults);
 		}
 
-		const resultEntries = await Promise.all(keys.map(async (key): Promise<[K, V]> => {
-			const value = await this.#store.get(key);
-			return [key, value!];
-		}));
-
-		return Object.fromEntries(resultEntries) as Record<K, V>;
+		return result as Record<K, V>;
 	}
 }

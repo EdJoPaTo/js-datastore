@@ -15,7 +15,7 @@
 	"scripts": {
 		"build": "rm -rf ./dist && tsc",
 		"prepack": "npm run build",
-		"test": "tsc --sourceMap && xo"
+		"test": "tsc --sourceMap && xo && node --test --enable-source-maps"
 	},
 	"type": "module",
 	"engines": {
@@ -33,8 +33,8 @@
 	},
 	"files": [
 		"dist",
-		"!*.test.*",
-		"!test.*"
+		"!**/*.test.*",
+		"!**/test.*"
 	],
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -42,6 +42,15 @@
 		{
 			"rules": {
 				"@typescript-eslint/prefer-readonly-parameter-types": "warn"
+			}
+		},
+		{
+			"files": [
+				"**/*.test.*",
+				"**/test.*"
+			],
+			"rules": {
+				"@typescript-eslint/prefer-readonly-parameter-types": "off"
 			}
 		}
 	]
