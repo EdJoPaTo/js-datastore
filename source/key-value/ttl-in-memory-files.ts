@@ -11,7 +11,7 @@ import type {ExtendedStore} from './type.ts';
 
 export class TtlKeyValueInMemoryFiles<K extends string, V>
 implements ExtendedStore<K, V> {
-	get ttlSupport() {
+	get ttlSupport(): boolean {
 		return true;
 	}
 

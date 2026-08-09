@@ -4,7 +4,7 @@ import type {ExtendedStore} from './type.ts';
 
 export class KeyValueInMemoryFile<K extends string, V>
 implements ExtendedStore<K, V> {
-	get ttlSupport() {
+	get ttlSupport(): boolean {
 		return false;
 	}
 
