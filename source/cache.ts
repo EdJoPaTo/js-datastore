@@ -1,24 +1,9 @@
 import {KeyValueInMemory} from './key-value/index.ts';
 import type {MaybePromise} from './types.ts';
 
-export type QueryOneFunction<K extends string, V> = (key: K) => MaybePromise<V>;
-export type QueryBulkFunction<K extends string, V> = (
+export type Query<K extends string, V> = (
 	keys: readonly K[],
 ) => MaybePromise<Record<K, V>>;
-
-type QueryOneArgument<K extends string, V> = {
-	readonly singleQuery: QueryOneFunction<K, V>;
-	readonly bulkQuery?: QueryBulkFunction<K, V>;
-};
-
-type QueryBulkArgument<K extends string, V> = {
-	readonly singleQuery?: QueryOneFunction<K, V>;
-	readonly bulkQuery: QueryBulkFunction<K, V>;
-};
-
-type QueryArgument<K extends string, V> =
-	| QueryOneArgument<K, V>
-	| QueryBulkArgument<K, V>;
 
 type Store<K extends string, V> = {
 	readonly get: (key: K) => MaybePromise<V | undefined>;
@@ -26,11 +11,12 @@ type Store<K extends string, V> = {
 };
 
 export type Options<K extends string, V> = {
+	readonly query: Query<K, V>;
 	readonly store?: Store<K, V>;
 	readonly ttl?: number;
 };
 
-function generateFallbackBulk<K extends string, V>(singleQuery: QueryOneFunction<K, V>): QueryBulkFunction<K, V> {
+export function cacheBulkQueryFromSingle<K extends string, V>(singleQuery: (key: K) => MaybePromise<V>): Query<K, V> {
 	return async keys => {
 		const entries = await Promise.all(keys.map(async (key): Promise<[K, V]> => [key, await singleQuery(key)]));
 		return Object.fromEntries(entries) as Record<K, V>;
@@ -42,22 +28,12 @@ export class Cache<K extends string, V> {
 
 	readonly #ttl: number | undefined;
 
-	readonly #singleQuery: QueryOneFunction<K, V>;
+	readonly #query: Query<K, V>;
 
-	readonly #bulkQuery: QueryBulkFunction<K, V>;
-
-	constructor(query: QueryArgument<K, V>, options: Options<K, V> = {}) {
+	constructor(options: Options<K, V>) {
+		this.#query = options.query;
 		this.#store = options.store ?? new KeyValueInMemory();
 		this.#ttl = options.ttl;
-
-		this.#singleQuery = query.singleQuery
-			?? (async key => {
-				const result = await query.bulkQuery!([key]);
-				return result[key];
-			});
-
-		this.#bulkQuery = query.bulkQuery
-			?? generateFallbackBulk(query.singleQuery!);
 	}
 
 	async get(key: K, forceQuery = false): Promise<V> {
@@ -68,7 +44,8 @@ export class Cache<K extends string, V> {
 			}
 		}
 
-		const queried = await this.#singleQuery(key);
+		const queriedRecord = await this.#query([key]);
+		const queried = queriedRecord[key];
 		await this.#store.set(key, queried, this.#ttl);
 		return queried;
 	}
@@ -86,8 +63,7 @@ export class Cache<K extends string, V> {
 		}
 
 		if (keysToBeLoaded.length > 0) {
-			const queryResults = await this.#bulkQuery(keysToBeLoaded);
-
+			const queryResults = await this.#query(keysToBeLoaded);
 			await Promise.all(Object.entries<V>(queryResults).map(async ([key, value]) =>
 				this.#store.set(key as K, value, this.#ttl)));
 		}
